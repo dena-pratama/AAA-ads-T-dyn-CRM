@@ -4,14 +4,17 @@ import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import { PipelineForm } from "@/components/pipelines/pipeline-form"
 import { pipelineSchema } from "@/lib/validators/pipeline"
+import { z } from "zod"
 
-export default async function EditPipelinePage({ params }: { params: { id: string } }) {
+export default async function EditPipelinePage({ params }: { params: Promise<{ id: string }> }) {
     const session = await auth()
     if (!session?.user) redirect("/login")
 
+    const { id } = await params
+
     // Retrieve pipeline
     const pipeline = await prisma.pipeline.findUnique({
-        where: { id: params.id }
+        where: { id }
     })
 
     if (!pipeline) {
@@ -29,10 +32,10 @@ export default async function EditPipelinePage({ params }: { params: { id: strin
     }
 
     // Cast JSON to expected type safely
-    const formattedData = {
+    const formattedData: z.infer<typeof pipelineSchema> & { id: string } = {
         ...pipeline,
-        stages: pipeline.stages as any,
-        customFields: pipeline.customFields as any,
+        stages: pipeline.stages as unknown as z.infer<typeof pipelineSchema>["stages"],
+        customFields: pipeline.customFields as unknown as z.infer<typeof pipelineSchema>["customFields"],
     }
 
     return (
@@ -40,6 +43,7 @@ export default async function EditPipelinePage({ params }: { params: { id: strin
             <PipelineForm
                 initialData={formattedData}
                 isSuperAdmin={session.user.role === "SUPER_ADMIN"}
+                readOnly={session.user.role !== "SUPER_ADMIN"}
                 clients={clients}
             />
         </div>

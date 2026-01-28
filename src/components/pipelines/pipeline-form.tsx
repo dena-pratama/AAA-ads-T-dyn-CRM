@@ -20,11 +20,12 @@ import { Badge } from "@/components/ui/badge"
 
 interface PipelineFormProps {
     initialData?: z.infer<typeof pipelineSchema> & { id: string }
-    clients?: { id: string; name: string }[] // For SuperAdmin to choose client (optional)
+    clients?: { id: string; name: string }[]
     isSuperAdmin?: boolean
+    readOnly?: boolean
 }
 
-export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFormProps) {
+export function PipelineForm({ initialData, clients, isSuperAdmin, readOnly = false }: PipelineFormProps) {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
 
@@ -59,6 +60,8 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
     })
 
     const onSubmit = async (values: z.infer<typeof pipelineSchema>) => {
+        if (readOnly) return;
+
         setIsLoading(true)
         try {
             // Re-index stages to ensure correct order before saving
@@ -99,18 +102,20 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-3xl font-bold tracking-tight">
-                            {initialData ? "Edit Pipeline" : "Create Pipeline"}
+                            {readOnly ? "View Pipeline" : (initialData ? "Edit Pipeline" : "Create Pipeline")}
                         </h2>
                         <p className="text-muted-foreground">
-                            Configure your sales process stages and data fields.
+                            {readOnly ? "View pipeline details and configuration." : "Configure your sales process stages and data fields."}
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" type="button" onClick={() => router.back()}>Cancel</Button>
-                        <Button type="submit" disabled={isLoading}>
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {initialData ? "Save Changes" : "Create Pipeline"}
-                        </Button>
+                        <Button variant="outline" type="button" onClick={() => router.back()}>Back</Button>
+                        {!readOnly && (
+                            <Button type="submit" disabled={isLoading}>
+                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {initialData ? "Save Changes" : "Create Pipeline"}
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -129,7 +134,7 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
                                         <FormItem>
                                             <FormLabel>Pipeline Name</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="e.g. Real Estate Sales" {...field} />
+                                                <Input placeholder="e.g. Real Estate Sales" {...field} disabled={readOnly} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -142,7 +147,7 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
                                         <FormItem>
                                             <FormLabel>Description</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Optional description" {...field} />
+                                                <Input placeholder="Optional description" {...field} disabled={readOnly} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -156,7 +161,7 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Assign to Client</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData}>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData || readOnly}>
                                                     <FormControl>
                                                         <SelectTrigger>
                                                             <SelectValue placeholder="Select a client" />
@@ -184,7 +189,7 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
                                     render={({ field }) => (
                                         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                             <FormControl>
-                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={readOnly} />
                                             </FormControl>
                                             <div className="space-y-1 leading-none">
                                                 <FormLabel>Set as Default</FormLabel>
@@ -201,7 +206,7 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
                                     render={({ field }) => (
                                         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                             <FormControl>
-                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={readOnly} />
                                             </FormControl>
                                             <div className="space-y-1 leading-none">
                                                 <FormLabel>Active</FormLabel>
@@ -225,26 +230,32 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
                                     <CardTitle>Pipeline Stages</CardTitle>
                                     <CardDescription>Define the steps of your sales process.</CardDescription>
                                 </div>
-                                <Button size="sm" variant="secondary" type="button" onClick={() => appendStage({
-                                    id: `stage_${Date.now()}`,
-                                    name: "New Stage",
-                                    color: "#64748B",
-                                    order: stageFields.length,
-                                    isGoal: false
-                                })}>
-                                    <Plus className="h-4 w-4 mr-2" /> Add Stage
-                                </Button>
+                                {!readOnly && (
+                                    <Button size="sm" variant="secondary" type="button" onClick={() => appendStage({
+                                        id: `stage_${Date.now()}`,
+                                        name: "New Stage",
+                                        color: "#64748B",
+                                        order: stageFields.length,
+                                        isGoal: false
+                                    })}>
+                                        <Plus className="h-4 w-4 mr-2" /> Add Stage
+                                    </Button>
+                                )}
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {stageFields.map((field, index) => (
                                     <div key={field.id} className="flex items-center gap-3 p-3 border rounded-lg bg-card hover:bg-accent/10 transition-colors">
                                         <div className="flex flex-col gap-1">
-                                            <Button type="button" variant="ghost" size="icon" className="h-6 w-6" disabled={index === 0} onClick={() => moveStage(index, index - 1)}>
-                                                <ArrowUp className="h-4 w-4" />
-                                            </Button>
-                                            <Button type="button" variant="ghost" size="icon" className="h-6 w-6" disabled={index === stageFields.length - 1} onClick={() => moveStage(index, index + 1)}>
-                                                <ArrowDown className="h-4 w-4" />
-                                            </Button>
+                                            {!readOnly && (
+                                                <>
+                                                    <Button type="button" variant="ghost" size="icon" className="h-6 w-6" disabled={index === 0} onClick={() => moveStage(index, index - 1)}>
+                                                        <ArrowUp className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button type="button" variant="ghost" size="icon" className="h-6 w-6" disabled={index === stageFields.length - 1} onClick={() => moveStage(index, index + 1)}>
+                                                        <ArrowDown className="h-4 w-4" />
+                                                    </Button>
+                                                </>
+                                            )}
                                         </div>
 
                                         <div className="grid grid-cols-12 gap-3 flex-1 items-center">
@@ -252,27 +263,29 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
                                             <div className="col-span-1 text-center font-mono text-sm text-muted-foreground">{index + 1}</div>
 
                                             <div className="col-span-5">
-                                                <Input {...form.register(`stages.${index}.name`)} placeholder="Stage Name" />
+                                                <Input {...form.register(`stages.${index}.name`)} placeholder="Stage Name" disabled={readOnly} />
                                             </div>
 
                                             <div className="col-span-2">
                                                 <div className="flex items-center gap-2">
-                                                    <Input type="color" {...form.register(`stages.${index}.color`)} className="w-8 h-8 p-0 border-0" />
+                                                    <Input type="color" {...form.register(`stages.${index}.color`)} className="w-8 h-8 p-0 border-0" disabled={readOnly} />
                                                     <span className="text-xs text-muted-foreground">Color</span>
                                                 </div>
                                             </div>
 
                                             <div className="col-span-4 flex items-center gap-4">
                                                 <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
-                                                    <input type="checkbox" {...form.register(`stages.${index}.isGoal`)} className="rounded border-gray-300" />
+                                                    <input type="checkbox" {...form.register(`stages.${index}.isGoal`)} className="rounded border-gray-300" disabled={readOnly} />
                                                     Is Goal?
                                                 </label>
                                             </div>
                                         </div>
 
-                                        <Button type="button" variant="ghost" size="icon" className="text-red-500 hover:text-red-700" onClick={() => removeStage(index)}>
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
+                                        {!readOnly && (
+                                            <Button type="button" variant="ghost" size="icon" className="text-red-500 hover:text-red-700" onClick={() => removeStage(index)}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        )}
                                     </div>
                                 ))}
                                 {stageFields.length === 0 && (
@@ -290,32 +303,37 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
                                     <CardTitle>Custom Fields</CardTitle>
                                     <CardDescription>Additional data fields for your leads.</CardDescription>
                                 </div>
-                                <Button size="sm" variant="secondary" type="button" onClick={() => appendField({
-                                    id: `field_${Date.now()}`,
-                                    name: "",
-                                    type: "text",
-                                    required: false
-                                })}>
-                                    <Plus className="h-4 w-4 mr-2" /> Add Field
-                                </Button>
+                                {!readOnly && (
+                                    <Button size="sm" variant="secondary" type="button" onClick={() => appendField({
+                                        id: `field_${Date.now()}`,
+                                        name: "",
+                                        type: "text",
+                                        required: false
+                                    })}>
+                                        <Plus className="h-4 w-4 mr-2" /> Add Field
+                                    </Button>
+                                )}
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {fieldFields.map((field, index) => (
                                     <div key={field.id} className="p-4 border rounded-lg space-y-4 relative bg-card">
-                                        <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 text-red-500 hover:text-red-700" onClick={() => removeField(index)}>
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
+                                        {!readOnly && (
+                                            <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 text-red-500 hover:text-red-700" onClick={() => removeField(index)}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        )}
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <Label className="text-xs uppercase text-muted-foreground">Field Label</Label>
-                                                <Input {...form.register(`customFields.${index}.name`)} placeholder="e.g. Budget" />
+                                                <Input {...form.register(`customFields.${index}.name`)} placeholder="e.g. Budget" disabled={readOnly} />
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className="text-xs uppercase text-muted-foreground">Type</Label>
                                                 <Select
                                                     onValueChange={(val: any) => form.setValue(`customFields.${index}.type`, val)}
                                                     defaultValue={form.getValues(`customFields.${index}.type`)}
+                                                    disabled={readOnly}
                                                 >
                                                     <SelectTrigger>
                                                         <SelectValue />
@@ -341,6 +359,7 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
                                                         form.setValue(`customFields.${index}.options`, arr);
                                                     }}
                                                     defaultValue={form.getValues(`customFields.${index}.options`)?.join(", ") || ""}
+                                                    disabled={readOnly}
                                                 />
                                                 <p className="text-xs text-muted-foreground">Separate options with commas.</p>
                                             </div>
@@ -348,7 +367,7 @@ export function PipelineForm({ initialData, clients, isSuperAdmin }: PipelineFor
 
                                         <div className="flex items-center gap-2">
                                             <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer select-none">
-                                                <input type="checkbox" {...form.register(`customFields.${index}.required`)} className="rounded border-gray-300" />
+                                                <input type="checkbox" {...form.register(`customFields.${index}.required`)} className="rounded border-gray-300" disabled={readOnly} />
                                                 This field is required
                                             </label>
                                         </div>

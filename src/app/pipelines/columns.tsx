@@ -4,7 +4,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Pencil, Trash } from "lucide-react"
+import { MoreHorizontal, Pencil, Trash, Eye } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,7 +14,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
-import { Checkbox } from "@/components/ui/checkbox"
+
 
 export type Pipeline = {
     id: string
@@ -28,11 +28,12 @@ export type Pipeline = {
     }
 }
 
-interface PipelineColumnsProps {
+export interface PipelineColumnsProps {
     onDelete: (id: string) => void
+    canManage: boolean
 }
 
-export const getColumns = ({ onDelete }: PipelineColumnsProps): ColumnDef<Pipeline>[] => [
+export const getColumns = ({ onDelete, canManage }: PipelineColumnsProps): ColumnDef<Pipeline>[] => [
     {
         accessorKey: "name",
         header: "Pipeline Name",
@@ -87,17 +88,28 @@ export const getColumns = ({ onDelete }: PipelineColumnsProps): ColumnDef<Pipeli
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Link href={`/pipelines/${pipeline.id}`} className="flex items-center cursor-pointer">
-                                <Pencil className="mr-2 h-4 w-4" />
-                                Edit Pipeline
+                                {canManage ? (
+                                    <>
+                                        <Pencil className="mr-2 h-4 w-4" />
+                                        Edit Pipeline
+                                    </>
+                                ) : (
+                                    <>
+                                        <Eye className="mr-2 h-4 w-4" />
+                                        View Pipeline
+                                    </>
+                                )}
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => onDelete(pipeline.id)}
-                            className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
-                        >
-                            <Trash className="mr-2 h-4 w-4" />
-                            Delete
-                        </DropdownMenuItem>
+                        {canManage && (
+                            <DropdownMenuItem
+                                onClick={() => onDelete(pipeline.id)}
+                                className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+                            >
+                                <Trash className="mr-2 h-4 w-4" />
+                                Delete
+                            </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

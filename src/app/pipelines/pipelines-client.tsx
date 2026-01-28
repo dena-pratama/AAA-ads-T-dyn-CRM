@@ -3,14 +3,6 @@
 
 import { useState } from "react"
 import { Pipeline, getColumns } from "./columns"
-import { DataTable } from "@/app/clients/data-table" // Reusing the DataTable from clients if generic, checking...
-// Wait, I should probably check if DataTable is generic. 
-// Assuming I can reuse or duplicate. Let's create a generic one or use the one I likely made.
-// I will assume I need to import the DataTable component.
-// Actually, better to check if I have a reusable DataTable in components/ui/data-table.tsx?
-// I recall seeing src/app/clients/data-table.tsx in the list. I should check if it is generic.
-// For now, I'll assume I can copy or import it.
-
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
@@ -24,21 +16,14 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { DataTable as GenericDataTable } from "@/components/ui/data-table" // I'll assume I should have one or check.
-
-// I'll define a local reusable DataTable import if the generic one doesn't exist, 
-// but based on typical patterns, I might have to use the one in clients or move it.
-// Let's check `src` folder structure again in previous steps... 
-// `src/app/clients/page.tsx` used `ClientsClient`.
-// `src/app/clients/data-table.tsx` exists.
-
-import { DataTable as ClientDataTable } from "@/app/clients/data-table"
+import { DataTable } from "@/components/ui/data-table"
 
 interface PipelinesClientProps {
     data: Pipeline[]
+    canManage?: boolean
 }
 
-export function PipelinesClient({ data }: PipelinesClientProps) {
+export function PipelinesClient({ data, canManage = false }: PipelinesClientProps) {
     const [deleteId, setDeleteId] = useState<string | null>(null)
     const [isDeleting, setIsDeleting] = useState(false)
 
@@ -57,10 +42,17 @@ export function PipelinesClient({ data }: PipelinesClientProps) {
         }
     }
 
-    const columns = getColumns({ onDelete: setDeleteId })
+    const columns = getColumns({ onDelete: setDeleteId, canManage })
 
     return (
         <div className="space-y-4">
+            <div className="flex items-center gap-4 mb-2">
+                <Button variant="outline" size="sm" asChild>
+                    <Link href="/dashboard">
+                        ← Back to Dashboard
+                    </Link>
+                </Button>
+            </div>
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Pipelines</h2>
@@ -68,14 +60,16 @@ export function PipelinesClient({ data }: PipelinesClientProps) {
                         Manage your CRM pipelines and stages.
                     </p>
                 </div>
-                <Button asChild>
-                    <Link href="/pipelines/new">
-                        <Plus className="mr-2 h-4 w-4" /> Create Pipeline
-                    </Link>
-                </Button>
+                {canManage && (
+                    <Button asChild>
+                        <Link href="/pipelines/new">
+                            <Plus className="mr-2 h-4 w-4" /> Create Pipeline
+                        </Link>
+                    </Button>
+                )}
             </div>
 
-            <ClientDataTable columns={columns} data={data} searchKey="name" />
+            <DataTable columns={columns} data={data} searchKey="name" />
 
             <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
                 <AlertDialogContent>

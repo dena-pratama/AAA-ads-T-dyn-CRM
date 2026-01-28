@@ -25,7 +25,7 @@ async function getClients() {
 
     // Serialize dates for client components if needed
     // Using simple mapping to ensure types match
-    return clients.map(client => ({
+    return clients.map((client) => ({
         ...client,
         createdAt: client.createdAt.toISOString(),
         updatedAt: client.updatedAt.toISOString(),
@@ -37,18 +37,20 @@ async function getClients() {
 export default async function ClientsPage() {
     const user = await getCurrentUser();
 
-    if (!user || user.role !== "SUPER_ADMIN") {
-        redirect("/dashboard");
+    if (!user) {
+        redirect("/login");
     }
 
     const clients = await getClients();
+
+    const canManage = user.role === "SUPER_ADMIN";
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
             <Header user={user} />
 
             <main className="container mx-auto px-6 py-8">
-                <ClientsClient data={clients} />
+                <ClientsClient data={clients} canManage={canManage} />
             </main>
         </div>
     );

@@ -32,9 +32,10 @@ export type Client = {
 interface ClientColumnsProps {
     onEdit: (client: Client) => void;
     onDelete: (client: Client) => void;
+    canManage: boolean;
 }
 
-export const getColumns = ({ onEdit, onDelete }: ClientColumnsProps): ColumnDef<Client>[] => [
+export const getColumns = ({ onEdit, onDelete, canManage }: ClientColumnsProps): ColumnDef<Client>[] => [
     {
         accessorKey: "name",
         header: ({ column }) => {
@@ -101,15 +102,19 @@ export const getColumns = ({ onEdit, onDelete }: ClientColumnsProps): ColumnDef<
                         <DropdownMenuItem onClick={() => navigator.clipboard.writeText(client.id)}>
                             Copy ID
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => onEdit(client)}>
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Edit Client
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => onDelete(client)}>
-                            <Trash className="mr-2 h-4 w-4" />
-                            Delete Client
-                        </DropdownMenuItem>
+                        {canManage && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => onEdit(client)}>
+                                    <Pencil className="mr-2 h-4 w-4" />
+                                    Edit Client
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => onDelete(client)}>
+                                    <Trash className="mr-2 h-4 w-4" />
+                                    Delete Client
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

@@ -21,9 +21,10 @@ import { Loader2 } from "lucide-react";
 
 interface ClientsClientProps {
     data: Client[];
+    canManage?: boolean;
 }
 
-export function ClientsClient({ data }: ClientsClientProps) {
+export function ClientsClient({ data, canManage = false }: ClientsClientProps) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
 
@@ -69,7 +70,7 @@ export function ClientsClient({ data }: ClientsClientProps) {
         setDialogOpen(true);
     };
 
-    const columns = getColumns({ onEdit: handleEdit, onDelete: confirmDelete });
+    const columns = getColumns({ onEdit: handleEdit, onDelete: confirmDelete, canManage });
 
     return (
         <>
@@ -79,10 +80,12 @@ export function ClientsClient({ data }: ClientsClientProps) {
                     <p className="text-slate-500 dark:text-slate-400">Manage your tenants and client accounts</p>
                 </div>
 
-                <Button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700 text-white">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Client
-                </Button>
+                {canManage && (
+                    <Button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Client
+                    </Button>
+                )}
             </div>
 
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-1">

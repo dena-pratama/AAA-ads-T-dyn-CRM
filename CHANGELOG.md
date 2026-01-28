@@ -45,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed module resolution error on Login page.
 - Fixed dashboard layout issues in Light mode.
 - Fixed `Next.js 15` async params issue in API routes.
+- **Fixed:** Pipeline View/Edit permissions for Client Admin (Read-Only mode enabled).
+- **Fixed:** Async params runtime error in dynamic routes (Next.js 15+ breaking change).
 
 ### Changed
 - **Rebranding & UI Overhaul:**

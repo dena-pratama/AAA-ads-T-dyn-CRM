@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { Prisma } from "@prisma/client"
 import { pipelineSchema } from "@/lib/validators/pipeline"
 import * as z from "zod"
 
@@ -10,7 +11,7 @@ const updatePipelineSchema = pipelineSchema.partial().omit({ clientId: true })
 
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await auth()
@@ -18,8 +19,10 @@ export async function GET(
             return new NextResponse("Unauthorized", { status: 401 })
         }
 
+        const { id } = await params
+
         const pipeline = await prisma.pipeline.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: {
                 client: { select: { name: true } }
             }
@@ -43,7 +46,7 @@ export async function GET(
 
 export async function PUT(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await auth()
@@ -51,17 +54,18 @@ export async function PUT(
             return new NextResponse("Unauthorized", { status: 401 })
         }
 
-        // CS cannot update pipelines
-        if (session.user.role === "CS") {
+        // Only SuperAdmin can update pipelines
+        if (session.user.role !== "SUPER_ADMIN") {
             return new NextResponse("Forbidden", { status: 403 })
         }
 
+        const { id } = await params
         const body = await req.json()
         const validData = updatePipelineSchema.parse(body)
 
         // Verify ownership before update
         const existingPipeline = await prisma.pipeline.findUnique({
-            where: { id: params.id }
+            where: { id }
         })
 
         if (!existingPipeline) {
@@ -73,14 +77,14 @@ export async function PUT(
         }
 
         const updatedPipeline = await prisma.pipeline.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 name: validData.name,
                 description: validData.description,
                 isDefault: validData.isDefault,
                 isActive: validData.isActive,
-                stages: validData.stages ? (validData.stages as any) : undefined,
-                customFields: validData.customFields ? (validData.customFields as any) : undefined,
+                stages: validData.stages ? (validData.stages as unknown as Prisma.InputJsonValue) : undefined,
+                customFields: validData.customFields ? (validData.customFields as unknown as Prisma.InputJsonValue) : undefined,
             }
         })
 
@@ -88,7 +92,7 @@ export async function PUT(
 
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return new NextResponse(JSON.stringify(error.errors), { status: 400 })
+            return new NextResponse(JSON.stringify(error.issues), { status: 400 })
         }
         console.error("[PIPELINE_PUT]", error)
         return new NextResponse("Internal error", { status: 500 })
@@ -97,7 +101,7 @@ export async function PUT(
 
 export async function DELETE(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await auth()
@@ -105,12 +109,14 @@ export async function DELETE(
             return new NextResponse("Unauthorized", { status: 401 })
         }
 
-        if (session.user.role === "CS") {
+        if (session.user.role !== "SUPER_ADMIN") {
             return new NextResponse("Forbidden", { status: 403 })
         }
 
+        const { id } = await params
+
         const existingPipeline = await prisma.pipeline.findUnique({
-            where: { id: params.id }
+            where: { id }
         })
 
         if (!existingPipeline) {
@@ -122,7 +128,7 @@ export async function DELETE(
         }
 
         await prisma.pipeline.delete({
-            where: { id: params.id }
+            where: { id }
         })
 
         return new NextResponse(null, { status: 204 })

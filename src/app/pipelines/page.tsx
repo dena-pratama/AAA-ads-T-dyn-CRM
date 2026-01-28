@@ -35,9 +35,11 @@ export default async function PipelinesPage() {
         createdAt: p.createdAt.toISOString()
     }))
 
+    const canManage = session.user.role === "SUPER_ADMIN"
+
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
-            <PipelinesClient data={formattedPipelines} />
+            <PipelinesClient data={formattedPipelines} canManage={canManage} />
         </div>
     )
 }

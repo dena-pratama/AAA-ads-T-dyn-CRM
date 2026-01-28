@@ -62,8 +62,7 @@ export async function POST(req: Request) {
             return new NextResponse("Unauthorized", { status: 401 })
         }
 
-        // Only Admin roles can create pipelines
-        if (session.user.role === "CS") {
+        if (session.user.role !== "SUPER_ADMIN") {
             return new NextResponse("Forbidden", { status: 403 })
         }
 
