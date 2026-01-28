@@ -39,6 +39,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Auth middleware for route protection
   - Login page with modern glassmorphism UI
   - Dashboard page with quick actions
+- **Fix:** Refactored Auth architecture for Edge Runtime compatibility
+  - Split config into `auth.config.ts` (Edge-safe) and `lib/auth.ts` (Node.js)
+  - Fixed Middleware 500 error caused by Prisma import in Edge environment
 
 ### 📝 Documentation
 - Created detailed `TASKS.md` with granular task breakdown
