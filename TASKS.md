@@ -1,0 +1,307 @@
+# 📋 Antigravity Nexus - Detailed Task Breakdown
+
+> **Project:** Universal Ad-Tracker & Dynamic CRM Platform  
+> **Start Date:** 2026-01-29  
+> **Target:** 14 Days MVP
+
+---
+
+## 🛠 Phase 0: Foundation Setup (Day 1-2)
+
+### 0.1 Project Initialization
+- [x] Create GitHub repository
+- [x] Setup `.gitignore` for Next.js + Prisma + Docker
+- [ ] Initialize Next.js 14+ with App Router
+  - [ ] TypeScript strict mode enabled
+  - [ ] ESLint + Prettier configuration
+  - [ ] Path aliases (`@/` for src)
+- [ ] Initial commit & push to GitHub
+
+### 0.2 UI Framework Setup
+- [ ] Install & configure Tailwind CSS
+- [ ] Setup Shadcn/UI
+  - [ ] Initialize with `npx shadcn-ui@latest init`
+  - [ ] Install base components: Button, Input, Card, Dialog, Table, Dropdown
+- [ ] Create base design tokens (colors, typography)
+- [ ] Create reusable layout components
+  - [ ] Sidebar navigation
+  - [ ] Header with user menu
+  - [ ] Page container
+
+### 0.3 Database Setup
+- [ ] Create `docker-compose.yml` for PostgreSQL 16
+- [ ] Setup Prisma ORM
+  - [ ] Initialize Prisma: `npx prisma init`
+  - [ ] Configure database connection
+- [ ] Create complete Prisma schema
+  - [ ] User model (with roles)
+  - [ ] Client model (multi-tenant)
+  - [ ] Pipeline model (JSONB stages)
+  - [ ] Campaign model
+  - [ ] AdSpendLog model
+  - [ ] Lead model
+  - [ ] MappingConfig model
+- [ ] Run initial migration
+- [ ] Create seed data script
+
+### 0.4 Authentication
+- [ ] Install NextAuth.js v5 (Auth.js)
+- [ ] Configure credentials provider (email/password)
+- [ ] Create auth middleware
+- [ ] Implement role-based access control
+  - [ ] SuperAdmin: Full access
+  - [ ] ClientAdmin: Client-scoped access
+  - [ ] CS: Lead entry only
+- [ ] Create login page
+- [ ] Create register page (SuperAdmin only)
+- [ ] Session management
+
+---
+
+## ⚙️ Phase 1: Client & Pipeline Management (Day 3-4)
+
+### 1.1 Client Management
+- [ ] API Routes
+  - [ ] `GET /api/clients` - List all clients
+  - [ ] `POST /api/clients` - Create client
+  - [ ] `GET /api/clients/[id]` - Get client detail
+  - [ ] `PUT /api/clients/[id]` - Update client
+  - [ ] `DELETE /api/clients/[id]` - Delete client
+- [ ] UI Pages
+  - [ ] `/clients` - Client list with DataTable
+  - [ ] `/clients/new` - Create client form
+  - [ ] `/clients/[id]` - Client detail/edit
+- [ ] Features
+  - [ ] Logo upload
+  - [ ] Currency selection
+  - [ ] Client status (active/inactive)
+
+### 1.2 Pipeline Builder
+- [ ] API Routes
+  - [ ] `GET /api/pipelines` - List pipelines (by client)
+  - [ ] `POST /api/pipelines` - Create pipeline
+  - [ ] `PUT /api/pipelines/[id]` - Update pipeline
+  - [ ] `DELETE /api/pipelines/[id]` - Delete pipeline
+- [ ] UI Pages
+  - [ ] `/pipelines` - Pipeline list
+  - [ ] `/pipelines/builder` - Visual pipeline builder
+- [ ] Features
+  - [ ] Drag-and-drop stage ordering (dnd-kit)
+  - [ ] Stage properties:
+    - [ ] Name
+    - [ ] Color
+    - [ ] Is Goal stage (for ROAS calculation)
+  - [ ] Custom fields schema builder
+    - [ ] Text field
+    - [ ] Number field
+    - [ ] Select/Dropdown
+    - [ ] Date picker
+  - [ ] Set default pipeline per client
+
+---
+
+## 📥 Phase 2: Ingestion Engine (Day 5-6)
+
+### 2.1 Smart CSV/Excel Importer
+- [ ] Install SheetJS (xlsx)
+- [ ] API Routes
+  - [ ] `POST /api/import/parse` - Parse uploaded file
+  - [ ] `POST /api/import/execute` - Execute import
+  - [ ] `GET /api/import/history` - Import history
+- [ ] UI Pages
+  - [ ] `/spend/import` - Import wizard
+- [ ] Features
+  - [ ] Step 1: File Upload
+    - [ ] Drag & drop zone
+    - [ ] Support .xlsx, .xls, .csv
+    - [ ] File size validation (max 10MB)
+  - [ ] Step 2: Sheet Selection (for multi-sheet Excel)
+  - [ ] Step 3: Data Preview
+    - [ ] Show first 10 rows
+    - [ ] Column type detection
+  - [ ] Step 4: Column Mapping
+    - [ ] Required: date, campaign_name, spend
+    - [ ] Optional: impressions, clicks, reach
+    - [ ] Platform selection
+    - [ ] Save mapping as template
+  - [ ] Step 5: Validation
+    - [ ] Data type validation
+    - [ ] Duplicate detection
+    - [ ] Error highlighting
+  - [ ] Step 6: Import Execution
+    - [ ] Progress indicator
+    - [ ] Success/error summary
+
+### 2.2 Mapping Configuration
+- [ ] API Routes
+  - [ ] `GET /api/mappings` - List saved mappings
+  - [ ] `POST /api/mappings` - Save mapping
+  - [ ] `DELETE /api/mappings/[id]` - Delete mapping
+- [ ] Features
+  - [ ] Auto-detect matching columns
+  - [ ] Platform-specific defaults
+  - [ ] Client-specific mappings
+
+### 2.3 Campaign Management
+- [ ] API Routes
+  - [ ] `GET /api/campaigns` - List campaigns
+  - [ ] `PUT /api/campaigns/[id]` - Update campaign
+  - [ ] `POST /api/campaigns/merge` - Merge campaigns
+- [ ] UI Pages
+  - [ ] `/campaigns` - Campaign master list
+- [ ] Features
+  - [ ] Auto-detect new campaigns from import
+  - [ ] Campaign rename
+  - [ ] Campaign merge (combine multiple into one)
+  - [ ] Campaign aliases (for matching)
+  - [ ] Deactivate campaign
+
+---
+
+## 📊 Phase 3: Data Grid & Inline Editing (Day 7-8)
+
+### 3.1 TanStack Table Setup
+- [ ] Install @tanstack/react-table
+- [ ] Create reusable DataTable component
+- [ ] Features
+  - [ ] Column definitions
+  - [ ] Sorting (multi-column)
+  - [ ] Filtering (column + global)
+  - [ ] Pagination
+  - [ ] Column visibility toggle
+  - [ ] Column resizing
+
+### 3.2 Ad Spend Grid
+- [ ] API Routes
+  - [ ] `GET /api/spend` - List spend data (with filters)
+  - [ ] `PUT /api/spend/[id]` - Update single record
+  - [ ] `PUT /api/spend/bulk` - Bulk update
+  - [ ] `DELETE /api/spend/[id]` - Delete record
+- [ ] UI Pages
+  - [ ] `/spend` - Spend data grid
+- [ ] Features
+  - [ ] Inline cell editing
+    - [ ] Click to edit
+    - [ ] Enter to save
+    - [ ] Escape to cancel
+  - [ ] Auto-save (debounced 500ms)
+  - [ ] Edit indicator (unsaved changes)
+  - [ ] Undo last change
+  - [ ] Date range filter
+  - [ ] Platform filter
+  - [ ] Campaign filter
+  - [ ] Export to Excel
+
+### 3.3 Performance Optimization
+- [ ] Virtual scrolling for 1000+ rows
+- [ ] Memoized cell renderers
+- [ ] Optimistic updates
+- [ ] Batch API calls
+
+---
+
+## 👥 Phase 4: CRM & Lead Entry (Day 9-10)
+
+### 4.1 Lead Entry Form
+- [ ] API Routes
+  - [ ] `POST /api/leads` - Create lead
+  - [ ] `GET /api/leads` - List leads
+  - [ ] `PUT /api/leads/[id]` - Update lead
+  - [ ] `PUT /api/leads/[id]/stage` - Update stage
+  - [ ] `DELETE /api/leads/[id]` - Delete lead
+- [ ] UI Pages
+  - [ ] `/leads` - Lead list/kanban
+  - [ ] `/leads/new` - Lead entry form
+  - [ ] `/leads/[id]` - Lead detail
+- [ ] Features
+  - [ ] Campaign source dropdown (from AdSpendLog)
+  - [ ] Dynamic form fields (from Pipeline config)
+  - [ ] Stage selection buttons
+  - [ ] Quick notes
+  - [ ] Revenue/value input
+
+### 4.2 Lead Views
+- [ ] List View
+  - [ ] DataTable with all leads
+  - [ ] Stage filter
+  - [ ] Date range filter
+  - [ ] Search by name/phone
+- [ ] Kanban View
+  - [ ] Columns = Pipeline stages
+  - [ ] Drag & drop to change stage
+  - [ ] Lead cards with summary
+  - [ ] Stage count indicators
+
+### 4.3 Lead Import (Bonus)
+- [ ] Bulk import leads from Excel
+- [ ] Column mapping similar to spend import
+
+---
+
+## 📈 Phase 5: Intelligence Dashboard (Day 11-14)
+
+### 5.1 Dashboard API
+- [ ] API Routes
+  - [ ] `GET /api/analytics/overview` - Summary metrics
+  - [ ] `GET /api/analytics/campaigns` - Per-campaign breakdown
+  - [ ] `GET /api/analytics/trends` - Time-series data
+- [ ] Aggregation Queries
+  - [ ] Total Spend
+  - [ ] Total Leads
+  - [ ] Leads per stage
+  - [ ] Total Revenue
+  - [ ] CPPL (Cost Per Potential Lead)
+  - [ ] ROAS (Return on Ad Spend)
+  - [ ] CPL (Cost Per Lead)
+
+### 5.2 Dashboard UI
+- [ ] UI Pages
+  - [ ] `/dashboard` - Main dashboard
+- [ ] Components
+  - [ ] Metric cards (with trend indicators)
+  - [ ] Campaign performance table
+  - [ ] Spend vs Revenue chart (line/bar)
+  - [ ] Lead funnel visualization
+  - [ ] Stage distribution (pie/donut)
+- [ ] Features
+  - [ ] Date range picker
+  - [ ] Client filter (SuperAdmin)
+  - [ ] Platform filter
+  - [ ] Campaign filter
+  - [ ] Export report to PDF/Excel
+
+### 5.3 Dynamic Columns
+- [ ] Table columns adjust based on Pipeline stages
+- [ ] Show lead count per stage
+- [ ] Conversion rate between stages
+
+---
+
+## 🐳 Phase 6: Deployment & Polish
+
+### 6.1 Dockerization
+- [ ] Create production Dockerfile
+- [ ] Multi-stage build (minimize image size)
+- [ ] Environment variable configuration
+- [ ] Health check endpoint
+
+### 6.2 Performance Testing
+- [ ] Test with 1000+ spend records
+- [ ] Test with 500+ leads
+- [ ] Measure page load times
+- [ ] Query optimization if needed
+
+### 6.3 Final Testing
+- [ ] End-to-end test: Create client with custom pipeline
+- [ ] End-to-end test: Import CSV, verify data
+- [ ] End-to-end test: Inline edit spend
+- [ ] End-to-end test: CS input lead, verify dashboard
+- [ ] Cross-browser testing
+
+---
+
+## 📝 Notes
+
+- Keep commits atomic and well-documented
+- Update CHANGELOG.md after each major feature
+- Document API endpoints in README or Swagger
