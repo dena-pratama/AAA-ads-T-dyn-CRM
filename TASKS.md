@@ -15,7 +15,7 @@
   - [x] TypeScript strict mode enabled
   - [x] ESLint + Prettier configuration
   - [x] Path aliases (`@/` for src)
-- [/] Initial commit & push to GitHub
+- [x] Initial commit & push to GitHub
 
 ### 0.2 UI Framework Setup
 - [x] Install & configure Tailwind CSS
@@ -23,10 +23,10 @@
   - [x] Initialize with `npx shadcn@latest init`
   - [x] Install base components: Button, Input, Card, Dialog, Table, Dropdown
 - [ ] Create base design tokens (colors, typography)
-- [ ] Create reusable layout components
-  - [ ] Sidebar navigation
-  - [ ] Header with user menu
-  - [ ] Page container
+- [x] Create reusable layout components
+  - [x] Sidebar navigation (Dashboard Layout)
+  - [x] Header with user menu
+  - [x] Page container
 
 ### 0.3 Database Setup
 - [x] Create `docker-compose.yml` for PostgreSQL 16
@@ -42,7 +42,7 @@
   - [x] Lead model
   - [x] MappingConfig model
 - [x] Run initial migration
-- [/] Create seed data script (Prisma 7 compatibility issue)
+- [/] Create seed data script (Prisma 7 compatibility issue marked for review)
 
 ### 0.4 Authentication
 - [x] Install NextAuth.js v5 (Auth.js)
@@ -55,6 +55,14 @@
 - [x] Create login page
 - [ ] Create register page (SuperAdmin only)
 - [x] Session management
+
+### 0.5 Rebranding & UI Polish (New)
+- [x] Rename app to "Asoy Analytics Ads"
+- [x] Update Logo (Dragon Icon)
+- [x] Remove Demo Credentials from Login UI
+- [x] Implement Light/Dark Mode (next-themes)
+- [x] Redesign Login Page (Clean/Glassmorphism with Theme Toggle)
+- [x] Fix Logout functionality (Server Action)
 
 ---
 

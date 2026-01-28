@@ -4,9 +4,18 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
+import Google from "next-auth/providers/google";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
     ...authConfig,
+    adapter: PrismaAdapter(prisma),
     providers: [
+        Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            allowDangerousEmailAccountLinking: true,
+        }),
         Credentials({
             name: "credentials",
             credentials: {
@@ -26,7 +35,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     include: { client: true },
                 });
 
-                if (!user || !user.isActive) {
+                // Check if user exists and has a password (provider users might not)
+                if (!user || !user.isActive || !user.password) {
                     return null;
                 }
 
@@ -49,6 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     role: user.role,
                     clientId: user.clientId,
                     clientName: user.client?.name,
+                    image: user.image,
                 };
             },
         }),
