@@ -41,8 +41,8 @@
   - [x] AdSpendLog model
   - [x] Lead model
   - [x] MappingConfig model
-- [ ] Run initial migration
-- [ ] Create seed data script
+- [x] Run initial migration
+- [/] Create seed data script (Prisma 7 compatibility issue)
 
 ### 0.4 Authentication
 - [ ] Install NextAuth.js v5 (Auth.js)

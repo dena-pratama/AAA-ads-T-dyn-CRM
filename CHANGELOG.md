@@ -79,13 +79,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Database:** Docker Compose with PostgreSQL 16 (or cloud alternative)
 
 #### Blockers:
-- ⚠️ Docker not installed - need to either install Docker or use cloud PostgreSQL (Neon/Supabase)
+- ✅ RESOLVED: Using Supabase cloud PostgreSQL instead of Docker
 
 #### Next Steps:
-- Resolve database hosting (Docker or cloud)
-- Run Prisma migration
-- Create seed data
-- Implement authentication
+- Implement authentication (NextAuth.js v5)
+- Build dashboard layout
+
+5. **Supabase Database Setup** (Session 3 - 01:48 WIB)
+   - Connected to Supabase cloud PostgreSQL
+   - Pushed Prisma schema successfully (9 models created)
+   - Generated Prisma client
+   - Verified Next.js dev server running at localhost:3000
+   - Note: Seed script has Prisma 7 compatibility issues - will fix later
 
 ---
 
