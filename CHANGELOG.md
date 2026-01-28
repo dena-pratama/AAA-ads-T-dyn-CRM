@@ -42,6 +42,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fix:** Refactored Auth architecture for Edge Runtime compatibility
   - Split config into `auth.config.ts` (Edge-safe) and `lib/auth.ts` (Node.js)
   - Fixed Middleware 500 error caused by Prisma import in Edge environment
+- Fixed module resolution error on Login page.
+- Fixed dashboard layout issues in Light mode.
+- Fixed `Next.js 15` async params issue in API routes.
+
+### Changed
 - **Rebranding & UI Overhaul:**
   - Renamed application to **"Asoy Analytics Ads"**
   - Updated application logo (Dragon Icon)
@@ -53,6 +58,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Updated copy ("Kalau login tanda nya kamu mau kerja")
   - Fixed Logout functionality using Server Actions
   - Added Theme Toggle component in Header and Login Page
+- Login page now hides demo credentials.
+  - Added Theme Toggle component in Header and Login Page
+- **Phase 1.1 UI & Feature Enhancements:**
+  - **Profile Settings:**
+    - Profile picture upload (Base64) with live preview and validation.
+    - Updated UI layout and improved type safety.
+  - **Dashboard:** 
+    - Removed redundant text and improved layout.
+  - **Header:** 
+    - Dynamic user role display (Super Admin vs Client Admin).
+  - **Client Management:**
+    - Renamed columns for better clarity (Id-Client, Business Model, Handler).
+    - Updated create/edit forms to match new terminology.
+  - **Code Quality:**
+    - Fixed linting errors across settings and client modules.
+    - Improved error handling in API calls.
 
 ### 📝 Documentation
 - Created detailed `TASKS.md` with granular task breakdown

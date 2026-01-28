@@ -41,7 +41,11 @@ export function Header({ user }: HeaderProps) {
                                 <h1 className="text-lg font-semibold text-foreground">
                                     Asoy Analytics Ads
                                 </h1>
-                                <p className="text-xs text-muted-foreground">{user.clientName || "Super Admin"}</p>
+                                <p className="text-xs text-muted-foreground">
+                                    {user.role === "SUPER_ADMIN"
+                                        ? "Super Admin"
+                                        : `${user.role.replace("_", " ")} ${user.clientName ? `— ${user.clientName}` : ""}`}
+                                </p>
                             </div>
                         </a>
                     </div>
@@ -75,8 +79,8 @@ export function Header({ user }: HeaderProps) {
                                         <a href="/users">Manage Users</a>
                                     </DropdownMenuItem>
                                 )}
-                                <DropdownMenuItem className="cursor-pointer">
-                                    Profile Settings
+                                <DropdownMenuItem asChild className="cursor-pointer">
+                                    <a href="/settings">Profile Settings</a>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="cursor-pointer p-0">

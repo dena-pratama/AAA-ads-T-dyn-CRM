@@ -63,26 +63,38 @@
 - [x] Implement Light/Dark Mode (next-themes)
 - [x] Redesign Login Page (Clean/Glassmorphism with Theme Toggle)
 - [x] Fix Logout functionality (Server Action)
+- [x] Dashboard UI Clean-up (Remove subtitle, fixes)
+- [x] Header Role Display (Dynamic user role badges)
 
 ---
 
 ## ⚙️ Phase 1: Client & Pipeline Management (Day 3-4)
 
+
 ### 1.1 Client Management
-- [ ] API Routes
-  - [ ] `GET /api/clients` - List all clients
-  - [ ] `POST /api/clients` - Create client
-  - [ ] `GET /api/clients/[id]` - Get client detail
-  - [ ] `PUT /api/clients/[id]` - Update client
-  - [ ] `DELETE /api/clients/[id]` - Delete client
-- [ ] UI Pages
-  - [ ] `/clients` - Client list with DataTable
-  - [ ] `/clients/new` - Create client form
-  - [ ] `/clients/[id]` - Client detail/edit
-- [ ] Features
-  - [ ] Logo upload
-  - [ ] Currency selection
-  - [ ] Client status (active/inactive)
+- [x] API Routes
+  - [x] `GET /api/clients` - List all clients
+  - [x] `POST /api/clients` - Create client
+  - [x] `GET /api/clients/[id]` - Get client detail (Not needed for MVP, included in list)
+  - [x] `PUT /api/clients/[id]` - Update client
+  - [x] `DELETE /api/clients/[id]` - Delete client
+- [x] UI Pages
+  - [x] `/clients` - Client list with DataTable
+  - [x] `/clients/new` - Create client form (Dialog)
+  - [x] Edit & Delete Actions with Alert Confirmation
+  - [x] Updated Column Headers (Id-Client, Business Model, Handler)
+
+### 1.1b User Management (New)
+- [x] API Routes (`/api/users`)
+  - [x] GET (List), POST (Create), PUT (Update), DELETE (Remove)
+- [x] UI Pages (`/users`)
+  - [x] User DataTable
+  - [x] Add/Edit User Dialog with Role & Client assignment logic
+  - [x] Profile Settings with Avatar Upload
+    - [x] Base64 Image Upload
+    - [x] Profile Picture Preview & Validation
+    - [x] Remove Picture functionality
+
 
 ### 1.2 Pipeline Builder
 - [ ] API Routes
