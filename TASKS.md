@@ -45,16 +45,16 @@
 - [/] Create seed data script (Prisma 7 compatibility issue)
 
 ### 0.4 Authentication
-- [ ] Install NextAuth.js v5 (Auth.js)
-- [ ] Configure credentials provider (email/password)
-- [ ] Create auth middleware
-- [ ] Implement role-based access control
-  - [ ] SuperAdmin: Full access
-  - [ ] ClientAdmin: Client-scoped access
-  - [ ] CS: Lead entry only
-- [ ] Create login page
+- [x] Install NextAuth.js v5 (Auth.js)
+- [x] Configure credentials provider (email/password)
+- [x] Create auth middleware
+- [x] Implement role-based access control
+  - [x] SuperAdmin: Full access
+  - [x] ClientAdmin: Client-scoped access
+  - [x] CS: Lead entry only
+- [x] Create login page
 - [ ] Create register page (SuperAdmin only)
-- [ ] Session management
+- [x] Session management
 
 ---
 

@@ -31,6 +31,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ImportHistory (batch tracking)
 - Docker Compose for PostgreSQL 16
 - Environment configuration (`.env`, `.env.example`)
+- **Supabase** cloud PostgreSQL integration
+- **NextAuth.js v5** authentication:
+  - Credentials provider (email/password)
+  - JWT session strategy
+  - Role-based access control (SuperAdmin, ClientAdmin, CS)
+  - Auth middleware for route protection
+  - Login page with modern glassmorphism UI
+  - Dashboard page with quick actions
 
 ### 📝 Documentation
 - Created detailed `TASKS.md` with granular task breakdown
