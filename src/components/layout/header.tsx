@@ -48,53 +48,64 @@ export function Header({ user }: HeaderProps) {
                                 </p>
                             </div>
                         </a>
-                    </div>
+                    </a>
+                </div>
 
-                    <div className="flex items-center gap-4">
-                        <ModeToggle />
+                {/* Desktop Navigation */}
+                <nav className="hidden md:flex items-center gap-6">
+                    <a href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">Dashboard</a>
+                    <a href="/clients" className="text-sm font-medium hover:text-primary transition-colors">Clients</a>
+                    {user.role === "SUPER_ADMIN" && (
+                        <a href="/users" className="text-sm font-medium hover:text-primary transition-colors">Users</a>
+                    )}
+                    <a href="/pipelines" className="text-sm font-medium hover:text-primary transition-colors">Pipelines</a>
+                </nav>
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                                    <Avatar className="h-10 w-10 border border-slate-200 dark:border-slate-700">
-                                        <AvatarImage src={user.image || ""} alt={user.name || "User"} />
-                                        <AvatarFallback className="bg-primary text-primary-foreground font-medium">
-                                            {user.name?.charAt(0) || "U"}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56" align="end" forceMount>
-                                <DropdownMenuLabel className="font-normal">
-                                    <div className="flex flex-col space-y-1">
-                                        <p className="text-sm font-medium leading-none">{user.name}</p>
-                                        <p className="text-xs leading-none text-muted-foreground">
-                                            {user.email}
-                                        </p>
-                                    </div>
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {user.role === "SUPER_ADMIN" && (
-                                    <DropdownMenuItem asChild className="cursor-pointer">
-                                        <a href="/users">Manage Users</a>
-                                    </DropdownMenuItem>
-                                )}
+                <div className="flex items-center gap-4">
+                    <ModeToggle />
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                                <Avatar className="h-10 w-10 border border-slate-200 dark:border-slate-700">
+                                    <AvatarImage src={user.image || ""} alt={user.name || "User"} />
+                                    <AvatarFallback className="bg-primary text-primary-foreground font-medium">
+                                        {user.name?.charAt(0) || "U"}
+                                    </AvatarFallback>
+                                </Avatar>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56" align="end" forceMount>
+                            <DropdownMenuLabel className="font-normal">
+                                <div className="flex flex-col space-y-1">
+                                    <p className="text-sm font-medium leading-none">{user.name}</p>
+                                    <p className="text-xs leading-none text-muted-foreground">
+                                        {user.email}
+                                    </p>
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {user.role === "SUPER_ADMIN" && (
                                 <DropdownMenuItem asChild className="cursor-pointer">
-                                    <a href="/settings">Profile Settings</a>
+                                    <a href="/users">Manage Users</a>
                                 </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="cursor-pointer p-0">
-                                    <form action={logout} className="w-full">
-                                        <button type="submit" className="w-full text-left px-2 py-1.5 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
-                                            Log out
-                                        </button>
-                                    </form>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+                            )}
+                            <DropdownMenuItem asChild className="cursor-pointer">
+                                <a href="/settings">Profile Settings</a>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="cursor-pointer p-0">
+                                <form action={logout} className="w-full">
+                                    <button type="submit" className="w-full text-left px-2 py-1.5 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
+                                        Log out
+                                    </button>
+                                </form>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
-        </header>
+        </div>
+        </header >
     );
 }

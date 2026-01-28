@@ -97,26 +97,21 @@
 
 
 ### 1.2 Pipeline Builder
-- [ ] API Routes
-  - [ ] `GET /api/pipelines` - List pipelines (by client)
-  - [ ] `POST /api/pipelines` - Create pipeline
-  - [ ] `PUT /api/pipelines/[id]` - Update pipeline
-  - [ ] `DELETE /api/pipelines/[id]` - Delete pipeline
-- [ ] UI Pages
-  - [ ] `/pipelines` - Pipeline list
-  - [ ] `/pipelines/builder` - Visual pipeline builder
-- [ ] Features
-  - [ ] Drag-and-drop stage ordering (dnd-kit)
-  - [ ] Stage properties:
-    - [ ] Name
-    - [ ] Color
-    - [ ] Is Goal stage (for ROAS calculation)
-  - [ ] Custom fields schema builder
-    - [ ] Text field
-    - [ ] Number field
-    - [ ] Select/Dropdown
-    - [ ] Date picker
-  - [ ] Set default pipeline per client
+- [x] API Routes
+  - [x] `GET /api/pipelines` - List pipelines (by client)
+  - [x] `POST /api/pipelines` - Create pipeline
+  - [x] `GET /api/pipelines/[id]` - Get pipeline detail
+  - [x] `PUT /api/pipelines/[id]` - Update pipeline
+  - [x] `DELETE /api/pipelines/[id]` - Delete pipeline
+- [x] UI Pages
+  - [x] `/pipelines` - Pipeline list
+  - [x] `/pipelines/builder` (implemented as `/pipelines/new` and `/pipelines/[id]`)
+- [x] Features
+  - [x] Reorder stages (Up/Down buttons)
+  - [x] Stage properties: name, color, goal status
+  - [x] Custom fields schema builder: text, number, select, date
+  - [x] Validation with Zod
+  - [x] Set default pipeline per client
 
 ---
 

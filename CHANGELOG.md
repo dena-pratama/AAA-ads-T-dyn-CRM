@@ -74,6 +74,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Code Quality:**
     - Fixed linting errors across settings and client modules.
     - Improved error handling in API calls.
+  - **Pipeline Builder (Phase 1.2):**
+    - **Visual Builder:** Create pipelines with custom stages (color-coded, goal tracking).
+    - **Custom Field Editor:** Add dynamic fields (Text, Number, Dropdown, Date) for leads.
+    - **Management:** List, Create, Edit, Delete pipelines with multi-tenant scoping.
+    - **Navigation:** Added 'Pipelines' to Dashboard and Header menu.
 
 ### 📝 Documentation
 - Created detailed `TASKS.md` with granular task breakdown
