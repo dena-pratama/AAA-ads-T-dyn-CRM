@@ -1,0 +1,321 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== ENUMS ====================
+
+enum UserRole {
+  SUPER_ADMIN
+  CLIENT_ADMIN
+  CS
+}
+
+enum AdPlatform {
+  META
+  GOOGLE
+  TIKTOK
+  SHOPEE
+  TOKOPEDIA
+  LAZADA
+  OTHER
+}
+
+enum LeadStatus {
+  ACTIVE
+  CONVERTED
+  LOST
+  ARCHIVED
+}
+
+// ==================== AUTH ====================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  role          UserRole  @default(CS)
+  isActive      Boolean   @default(true)
+  
+  // Multi-tenant relationship
+  clientId      String?
+  client        Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  
+  // Audit trail
+  createdLeads  Lead[]    @relation("LeadCreatedBy")
+  updatedLeads  Lead[]    @relation("LeadUpdatedBy")
+  
+  @@index([email])
+  @@index([clientId])
+}
+
+// ==================== MULTI-TENANT ====================
+
+model Client {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique // URL-friendly identifier
+  currency      String    @default("IDR")
+  logo          String?
+  description   String?
+  isActive      Boolean   @default(true)
+  
+  // Settings stored as JSON
+  settings      Json?     // { timezone, dateFormat, etc. }
+  
+  // Relationships
+  users         User[]
+  pipelines     Pipeline[]
+  campaigns     Campaign[]
+  spendLogs     AdSpendLog[]
+  leads         Lead[]
+  mappingConfigs MappingConfig[]
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([slug])
+}
+
+// ==================== DYNAMIC PIPELINE ====================
+
+model Pipeline {
+  id            String    @id @default(cuid())
+  clientId      String
+  client        Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  name          String
+  description   String?
+  
+  // Dynamic stages configuration
+  // Format: [{ "id": "stage_1", "name": "New Lead", "color": "#3B82F6", "order": 1, "isGoal": false }]
+  stages        Json      @default("[]")
+  
+  // Custom fields schema for lead entry form
+  // Format: [{ "id": "field_1", "name": "Product Type", "type": "select", "options": ["A", "B"], "required": true }]
+  customFields  Json      @default("[]")
+  
+  isDefault     Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relationships
+  leads         Lead[]
+  
+  @@unique([clientId, name])
+  @@index([clientId])
+}
+
+// ==================== CAMPAIGN MASTER ====================
+
+model Campaign {
+  id            String      @id @default(cuid())
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  name          String      // Display name (can be renamed)
+  originalName  String      // Original name from import
+  
+  // For campaign merging - stores alternative names
+  // Format: ["old_name_1", "old_name_2"]
+  aliases       String[]    @default([])
+  
+  platform      AdPlatform  @default(OTHER)
+  isActive      Boolean     @default(true)
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Relationships
+  spendLogs     AdSpendLog[]
+  leads         Lead[]
+  
+  @@unique([clientId, originalName])
+  @@index([clientId])
+  @@index([name])
+}
+
+// ==================== AD SPEND (IMPORT DATA) ====================
+
+model AdSpendLog {
+  id            String      @id @default(cuid())
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // Link to campaign master
+  campaignId    String?
+  campaign      Campaign?   @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  
+  // Core metrics
+  date          DateTime    @db.Date
+  platform      AdPlatform
+  campaignName  String      // Raw campaign name from import
+  
+  spend         Decimal     @db.Decimal(15, 2)
+  impressions   Int         @default(0)
+  clicks        Int         @default(0)
+  reach         Int         @default(0)
+  
+  // Additional metrics (optional)
+  ctr           Decimal?    @db.Decimal(10, 4)  // Click-through rate
+  cpc           Decimal?    @db.Decimal(10, 2)  // Cost per click
+  cpm           Decimal?    @db.Decimal(10, 2)  // Cost per mille
+  
+  // Extra data from import
+  rawData       Json?       // Store original row for reference
+  
+  // Import tracking
+  importBatchId String?     // Group imports together
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@index([clientId, date])
+  @@index([campaignName])
+  @@index([campaignId])
+  @@index([importBatchId])
+}
+
+// ==================== CRM LEADS ====================
+
+model Lead {
+  id            String      @id @default(cuid())
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // Basic info
+  customerName  String
+  phone         String
+  email         String?
+  
+  // Campaign source - linking key
+  campaignId    String?
+  campaign      Campaign?   @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  campaignName  String      // Raw campaign name for matching
+  
+  // Pipeline tracking
+  pipelineId    String?
+  pipeline      Pipeline?   @relation(fields: [pipelineId], references: [id], onDelete: SetNull)
+  currentStage  String      // References Pipeline.stages[].id
+  
+  // Dynamic custom data
+  // Format: { "product_type": "Maklon", "bottle_size": "500ml" }
+  customData    Json        @default("{}")
+  
+  // Revenue tracking
+  value         Decimal?    @db.Decimal(15, 2)
+  
+  // Status
+  status        LeadStatus  @default(ACTIVE)
+  notes         String?
+  
+  // Lead date (separate from createdAt)
+  leadDate      DateTime    @default(now())
+  
+  // Audit
+  createdById   String?
+  createdBy     User?       @relation("LeadCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById   String?
+  updatedBy     User?       @relation("LeadUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Stage history
+  stageHistory  LeadStageHistory[]
+  
+  @@index([clientId, campaignName])
+  @@index([currentStage])
+  @@index([status])
+  @@index([leadDate])
+}
+
+// Track stage transitions
+model LeadStageHistory {
+  id            String    @id @default(cuid())
+  leadId        String
+  lead          Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  fromStage     String?
+  toStage       String
+  
+  movedAt       DateTime  @default(now())
+  movedById     String?
+  
+  @@index([leadId])
+}
+
+// ==================== IMPORT CONFIG ====================
+
+model MappingConfig {
+  id            String      @id @default(cuid())
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  name          String
+  description   String?
+  platform      AdPlatform
+  
+  // Column mappings
+  // Format: { "Amount Spent (IDR)": "spend", "Impressions": "impressions" }
+  columnMappings Json
+  
+  // Data transformations
+  // Format: { "date_format": "DD/MM/YYYY", "decimal_separator": "," }
+  transformations Json?
+  
+  isDefault     Boolean     @default(false)
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@unique([clientId, name])
+  @@index([clientId])
+}
+
+// ==================== IMPORT HISTORY ====================
+
+model ImportHistory {
+  id            String      @id @default(cuid())
+  clientId      String
+  
+  batchId       String      @unique // For grouping AdSpendLogs
+  fileName      String
+  platform      AdPlatform
+  
+  totalRows     Int
+  successRows   Int
+  errorRows     Int
+  
+  // Store error details
+  errors        Json?       // [{ row: 1, error: "Invalid date" }]
+  
+  importedById  String?
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  
+  @@index([clientId])
+  @@index([batchId])
+}

@@ -11,17 +11,17 @@
 ### 0.1 Project Initialization
 - [x] Create GitHub repository
 - [x] Setup `.gitignore` for Next.js + Prisma + Docker
-- [ ] Initialize Next.js 14+ with App Router
-  - [ ] TypeScript strict mode enabled
-  - [ ] ESLint + Prettier configuration
-  - [ ] Path aliases (`@/` for src)
-- [ ] Initial commit & push to GitHub
+- [x] Initialize Next.js 14+ with App Router
+  - [x] TypeScript strict mode enabled
+  - [x] ESLint + Prettier configuration
+  - [x] Path aliases (`@/` for src)
+- [/] Initial commit & push to GitHub
 
 ### 0.2 UI Framework Setup
-- [ ] Install & configure Tailwind CSS
-- [ ] Setup Shadcn/UI
-  - [ ] Initialize with `npx shadcn-ui@latest init`
-  - [ ] Install base components: Button, Input, Card, Dialog, Table, Dropdown
+- [x] Install & configure Tailwind CSS
+- [x] Setup Shadcn/UI
+  - [x] Initialize with `npx shadcn@latest init`
+  - [x] Install base components: Button, Input, Card, Dialog, Table, Dropdown
 - [ ] Create base design tokens (colors, typography)
 - [ ] Create reusable layout components
   - [ ] Sidebar navigation
@@ -29,18 +29,18 @@
   - [ ] Page container
 
 ### 0.3 Database Setup
-- [ ] Create `docker-compose.yml` for PostgreSQL 16
-- [ ] Setup Prisma ORM
-  - [ ] Initialize Prisma: `npx prisma init`
-  - [ ] Configure database connection
-- [ ] Create complete Prisma schema
-  - [ ] User model (with roles)
-  - [ ] Client model (multi-tenant)
-  - [ ] Pipeline model (JSONB stages)
-  - [ ] Campaign model
-  - [ ] AdSpendLog model
-  - [ ] Lead model
-  - [ ] MappingConfig model
+- [x] Create `docker-compose.yml` for PostgreSQL 16
+- [x] Setup Prisma ORM
+  - [x] Initialize Prisma: `npx prisma init`
+  - [x] Configure database connection
+- [x] Create complete Prisma schema
+  - [x] User model (with roles)
+  - [x] Client model (multi-tenant)
+  - [x] Pipeline model (JSONB stages)
+  - [x] Campaign model
+  - [x] AdSpendLog model
+  - [x] Lead model
+  - [x] MappingConfig model
 - [ ] Run initial migration
 - [ ] Create seed data script
 

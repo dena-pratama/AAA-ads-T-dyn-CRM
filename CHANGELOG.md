@@ -12,6 +12,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🚀 Added
 - Initial project repository setup
 - Comprehensive `.gitignore` for Next.js + Prisma + Docker
+- **Next.js 14+ project** with App Router & TypeScript strict mode
+- **Tailwind CSS v4** integration
+- **Shadcn/UI** with 21 components:
+  - button, input, card, dialog, table, dropdown-menu
+  - select, tabs, sonner, separator, badge, avatar
+  - label, sheet, scroll-area, command, popover
+  - calendar, checkbox, form, skeleton
+- **Prisma ORM** setup with complete schema:
+  - User (multi-role: SuperAdmin, ClientAdmin, CS)
+  - Client (multi-tenant)
+  - Pipeline (dynamic stages with JSONB)
+  - Campaign (with merge/alias support)
+  - AdSpendLog (ad spend import data)
+  - Lead (CRM with dynamic custom fields)
+  - MappingConfig (CSV import mappings)
+  - LeadStageHistory (audit trail)
+  - ImportHistory (batch tracking)
+- Docker Compose for PostgreSQL 16
+- Environment configuration (`.env`, `.env.example`)
 
 ### 📝 Documentation
 - Created detailed `TASKS.md` with granular task breakdown
@@ -45,16 +64,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 3. **Initial Commit**
    - Commit: `chore: initial commit - add .gitignore for Next.js + Prisma + Docker`
 
+4. **Next.js Project Initialization** (Session 2 - 01:32 WIB)
+   - Initialized Next.js 14+ with App Router
+   - TypeScript strict mode configured
+   - Installed Tailwind CSS v4
+   - Setup Shadcn/UI with 21 components
+   - Created Prisma schema with 9 models
+   - Created Docker Compose for PostgreSQL 16
+   - Note: Docker not installed on system - consider using cloud DB
+
 #### Decisions Made:
 - **Authentication:** NextAuth.js v5 (recommended)
 - **File Parsing:** Client-side with SheetJS (better UX)
-- **Database:** Docker Compose with PostgreSQL 16
+- **Database:** Docker Compose with PostgreSQL 16 (or cloud alternative)
+
+#### Blockers:
+- ⚠️ Docker not installed - need to either install Docker or use cloud PostgreSQL (Neon/Supabase)
 
 #### Next Steps:
-- Initialize Next.js project with TypeScript strict mode
-- Setup Shadcn/UI and Tailwind CSS
-- Create Docker Compose for PostgreSQL
-- Implement Prisma schema
+- Resolve database hosting (Docker or cloud)
+- Run Prisma migration
+- Create seed data
+- Implement authentication
 
 ---
 

@@ -65,3 +65,5 @@ postgres-data/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+/src/generated/prisma
