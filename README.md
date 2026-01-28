@@ -1,4 +1,4 @@
-# 🚀 Antigravity Nexus
+# 🚀 AAA Ads CRM
 
 > Universal Ad-Tracker & Dynamic CRM Platform
 
@@ -11,7 +11,7 @@
 
 ## 📋 Overview
 
-**Antigravity Nexus** adalah platform Business Intelligence & CRM multi-tenant untuk memonitor efektivitas iklan (Ad Spend) terhadap hasil bisnis nyata (Revenue/Leads).
+**AAA Ads CRM** adalah platform Business Intelligence & CRM multi-tenant untuk memonitor efektivitas iklan (Ad Spend) terhadap hasil bisnis nyata (Revenue/Leads).
 
 ### Core Features
 
@@ -161,4 +161,4 @@ Private - All Rights Reserved
 ## 👥 Team
 
 - **Project Owner:** Dena Pratama
-- **Development:** AI-Assisted (Antigravity)
+- **Development:** AI-Assisted (AAA Ads CRM)

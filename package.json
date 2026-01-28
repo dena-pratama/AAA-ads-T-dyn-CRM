@@ -1,7 +1,7 @@
 {
-  "name": "antigravity-nexus",
+  "name": "aaa-ads-crm",
   "version": "0.1.0",
-  "description": "Universal Ad-Tracker & Dynamic CRM Platform",
+  "description": "AAA Ads T Dynamic CRM Platform",
   "private": true,
   "scripts": {
     "dev": "next dev",

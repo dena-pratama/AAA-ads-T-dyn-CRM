@@ -1,4 +1,4 @@
-# 📜 Changelog - Antigravity Nexus
+# 📜 Changelog - AAA Ads CRM
 
 All notable changes to this project will be documented in this file.
 
@@ -115,5 +115,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Contributors
 
-- **Developer:** AI Assistant (Antigravity)
+- **Developer:** AI Assistant (AAA Ads CRM)
 - **Project Owner:** Dena Pratama

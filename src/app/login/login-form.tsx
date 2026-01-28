@@ -74,7 +74,7 @@ export function LoginForm() {
                     Demo credentials:
                 </p>
                 <p className="text-slate-500 text-xs mt-1">
-                    admin@antigravity.io / Admin@123
+                    admin@aaa-ads.com / Admin@123
                 </p>
             </div>
         </form>

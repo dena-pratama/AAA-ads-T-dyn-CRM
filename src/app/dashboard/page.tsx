@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-    title: "Dashboard - Antigravity Nexus",
+    title: "Dashboard - AAA Ads CRM",
 };
 
 export default async function DashboardPage() {
@@ -37,7 +37,7 @@ export default async function DashboardPage() {
                             </div>
                             <div>
                                 <h1 className="text-lg font-semibold text-white">
-                                    Antigravity Nexus
+                                    AAA Ads CRM
                                 </h1>
                                 <p className="text-xs text-slate-400">{user.clientName || "Super Admin"}</p>
                             </div>

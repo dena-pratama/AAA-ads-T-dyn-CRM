@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
-    title: "Login - Antigravity Nexus",
+    title: "Login - AAA Ads CRM",
     description: "Login to your account",
 };
 
@@ -30,10 +30,10 @@ export default function LoginPage() {
                         </svg>
                     </div>
                     <h1 className="text-3xl font-bold text-white mb-2">
-                        Antigravity Nexus
+                        AAA Ads CRM
                     </h1>
                     <p className="text-slate-400">
-                        Universal Ad-Tracker & CRM Platform
+                        Universal Ad-Tracker & Dynamic CRM
                     </p>
                 </div>
 
@@ -47,7 +47,7 @@ export default function LoginPage() {
 
                 {/* Footer */}
                 <p className="text-center text-slate-500 text-sm mt-8">
-                    &copy; 2026 Antigravity Nexus. All rights reserved.
+                    &copy; 2026 AAA Ads CRM. All rights reserved.
                 </p>
             </div>
         </div>
