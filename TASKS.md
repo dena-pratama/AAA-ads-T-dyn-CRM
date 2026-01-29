@@ -225,7 +225,7 @@
   - [ ] `PUT /api/leads/[id]/stage` - Update stage
   - [ ] `DELETE /api/leads/[id]` - Delete lead
 - [ ] UI Pages
-  - [ ] `/leads` - Lead list/kanban
+  - [x] `/leads` - Lead list/kanban (Placeholder + Import Trigger)
   - [ ] `/leads/new` - Lead entry form
   - [ ] `/leads/[id]` - Lead detail
 - [ ] Features
@@ -248,8 +248,8 @@
   - [ ] Stage count indicators
 
 ### 4.3 Lead Import (Bonus)
-- [ ] Bulk import leads from Excel
-- [ ] Column mapping similar to spend import
+- [x] Bulk import leads from Excel
+- [x] Column mapping similar to spend import
 
 ---
 
