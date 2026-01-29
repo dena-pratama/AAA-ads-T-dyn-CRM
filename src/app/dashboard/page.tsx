@@ -106,6 +106,21 @@ export default async function DashboardPage() {
                         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Pipelines</h3>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Atur stages & fields</p>
                     </a>
+
+                    {/* Campaigns Card */}
+                    <a
+                        href="/campaigns"
+                        className="group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/50 dark:hover:border-cyan-500/50 transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/5 dark:hover:shadow-cyan-500/10"
+                    >
+                        <div className="w-12 h-12 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Campaigns</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Manage & merge campaigns</p>
+                    </a>
                 </div>
 
                 {/* Info */}

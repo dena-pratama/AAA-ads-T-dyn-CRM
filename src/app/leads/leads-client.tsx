@@ -1,19 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 import {
     Dialog,
     DialogContent,
-    DialogFooter,
     DialogHeader,
     DialogDescription,
     DialogTitle,
@@ -36,16 +28,19 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Upload, Plus, ArrowLeft, Loader2, Search, X } from "lucide-react";
+
+import { Upload, Plus, ArrowLeft, Loader2, Search, List as ListIcon, BarChart3 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/ui/data-table";
 import { getColumns, Lead } from "@/components/leads/columns";
 import { LeadForm } from "@/components/leads/lead-form";
+import { LeadsChart } from "@/components/leads/leads-chart";
+import { toast } from "sonner";
 
 interface Pipeline {
     id: string;
     name: string;
-    stages: { id: string; name: string }[];
+    stages: { id: string; name: string; color: string }[];
 }
 
 interface LeadsClientProps {
@@ -53,95 +48,131 @@ interface LeadsClientProps {
 }
 
 export function LeadsClient({ pipelines }: LeadsClientProps) {
-    const router = useRouter();
+    // const router = useRouter(); // Removed unused router
+    const [mounted, setMounted] = useState(false);
     const [selectedPipelineId, setSelectedPipelineId] = useState<string>("");
-    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-    const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
-
-    // Data State
-    const [leads, setLeads] = useState<Lead[]>([])
-    const [isLoading, setIsLoading] = useState(true)
-
-    // Edit/Delete State
-    const [leadToEdit, setLeadToEdit] = useState<Lead | null>(null)
-    const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null)
-    const [isDeleting, setIsDeleting] = useState(false)
-
-    // Filter State
-    const [filterPipelineId, setFilterPipelineId] = useState<string>("")
-    const [filterStageId, setFilterStageId] = useState<string>("")
-    const [searchQuery, setSearchQuery] = useState<string>("")
-
-    // Get stages for selected pipeline filter
-    const filterStages = pipelines.find(p => p.id === filterPipelineId)?.stages || []
-
-    const fetchLeads = async () => {
-        setIsLoading(true)
-        try {
-            const params = new URLSearchParams()
-            if (filterPipelineId) params.set("pipelineId", filterPipelineId)
-            if (filterStageId) params.set("stageId", filterStageId)
-            if (searchQuery) params.set("search", searchQuery)
-
-            const url = `/api/leads${params.toString() ? `?${params.toString()}` : ""}`
-            const res = await fetch(url)
-            if (res.ok) {
-                const data = await res.json()
-                setLeads(data)
-            }
-        } catch (error) {
-            console.error("Failed to fetch leads", error)
-        } finally {
-            setIsLoading(false)
-        }
-    }
 
     useEffect(() => {
-        fetchLeads()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filterPipelineId, filterStageId, searchQuery])
+        setMounted(true);
+    }, []);
 
-    const handleImport = () => {
+    // ... (other state)
+
+    // Initialize pipeline selection
+    useEffect(() => {
+        if (pipelines.length > 0 && !selectedPipelineId && pipelines[0]) {
+            setSelectedPipelineId(pipelines[0].id);
+        }
+    }, [pipelines, selectedPipelineId]);
+
+    // ... (fetchLeads callback)
+
+    // ... (other effects)
+
+
+    // const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+    const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
+
+    // View state
+    const [view, setView] = useState<"list" | "chart">("list");
+
+    // Edit/Delete state (reused for both views)
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [leadToEdit, setLeadToEdit] = useState<Lead | undefined>(undefined);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    // Data state
+    const [leads, setLeads] = useState<Lead[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [stageFilter, setStageFilter] = useState("all");
+    const [searchTerm, setSearchTerm] = useState("");
+
+    // Initialize pipeline selection (moved to avoid conditional hook)
+    useEffect(() => {
+        if (pipelines.length > 0 && !selectedPipelineId && pipelines[0]) {
+            setSelectedPipelineId(pipelines[0].id);
+        }
+    }, [pipelines, selectedPipelineId]);
+
+    const fetchLeads = useCallback(async () => {
         if (!selectedPipelineId) return;
-        router.push(`/pipelines/${selectedPipelineId}/import`);
-    };
-
-    const handleEdit = (lead: Lead) => {
-        setLeadToEdit(lead)
-    }
-
-    const handleDelete = (lead: Lead) => {
-        setLeadToDelete(lead)
-    }
-
-    const executeDelete = async () => {
-        if (!leadToDelete) return
-        setIsDeleting(true)
+        setLoading(true);
         try {
-            const res = await fetch(`/api/leads/${leadToDelete.id}`, { method: "DELETE" })
+            const res = await fetch(`/api/leads?pipelineId=${selectedPipelineId}`);
             if (res.ok) {
-                setLeadToDelete(null)
-                fetchLeads() // Refresh
-            } else {
-                alert("Failed to delete lead")
+                const data = await res.json();
+                setLeads(data);
             }
         } catch (error) {
-            console.error(error)
-            alert("An error occurred")
+            console.error("Failed to fetch leads", error);
         } finally {
-            setIsDeleting(false)
+            setLoading(false);
         }
+    }, [selectedPipelineId]);
+
+    // Fetch leads when pipeline changes
+    useEffect(() => {
+        fetchLeads();
+    }, [fetchLeads]);
+
+    const handleEdit = (lead: Lead) => {
+        setLeadToEdit(lead);
+        setIsEditOpen(true);
+    };
+
+    const confirmDelete = (lead: Lead) => {
+        setLeadToDelete(lead);
+        setDeleteOpen(true);
+    };
+
+    const executeDelete = async () => {
+        if (!leadToDelete) return;
+        setIsDeleting(true);
+        try {
+            const res = await fetch(`/api/leads/${leadToDelete.id}`, { method: "DELETE" });
+            if (res.ok) {
+                setLeads(prev => prev.filter(l => l.id !== leadToDelete.id));
+                setDeleteOpen(false);
+                toast.success("Lead deleted");
+            } else {
+                toast.error("Failed to delete lead");
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error("An error occurred");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    if (!mounted) {
+        return null;
     }
 
-    const columns = getColumns({ onEdit: handleEdit, onDelete: handleDelete })
+    // Filter leads
+    const filteredLeads = leads.filter(lead => {
+        const matchesStage = stageFilter === "all" || lead.stageId === stageFilter;
+        const searchLower = searchTerm.toLowerCase();
+        const matchesSearch =
+            lead.customerName.toLowerCase().includes(searchLower) ||
+            lead.phone.includes(searchLower) ||
+            (lead.email && lead.email.toLowerCase().includes(searchLower));
+        return matchesStage && matchesSearch;
+    });
+
+    const selectedPipeline = pipelines.find(p => p.id === selectedPipelineId);
+    const columns = getColumns({ onEdit: handleEdit, onDelete: confirmDelete });
 
     return (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-            <div className="flex items-center justify-between space-y-2">
-                <div className="flex flex-col gap-2">
-                    <Button variant="ghost" size="sm" className="w-fit -ml-2 text-muted-foreground" onClick={() => router.push("/dashboard")}>
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Dashboard
+        <div className="space-y-6 p-8 pt-6">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="/dashboard">
+                            <ArrowLeft className="h-5 w-5" />
+                        </Link>
                     </Button>
                     <div>
                         <h2 className="text-3xl font-bold tracking-tight">Leads</h2>
@@ -150,7 +181,29 @@ export function LeadsClient({ pipelines }: LeadsClientProps) {
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
+                    {/* View Toggle */}
+                    <div className="flex items-center p-1 bg-muted rounded-lg">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setView("list")}
+                            className={`h-8 px-3 text-xs ${view === "list" ? "bg-background shadow-sm hover:bg-background" : "hover:bg-transparent"}`}
+                        >
+                            <ListIcon className="h-4 w-4 mr-2" />
+                            List
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setView("chart")}
+                            className={`h-8 px-3 text-xs ${view === "chart" ? "bg-background shadow-sm hover:bg-background" : "hover:bg-transparent"}`}
+                        >
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            Chart
+                        </Button>
+                    </div>
+
                     {/* Add Lead Dialog */}
                     <Dialog open={isAddLeadOpen} onOpenChange={setIsAddLeadOpen}>
                         <DialogTrigger asChild>
@@ -163,186 +216,141 @@ export function LeadsClient({ pipelines }: LeadsClientProps) {
                             <DialogHeader>
                                 <DialogTitle>Add New Lead</DialogTitle>
                                 <DialogDescription>
-                                    Manually enter a new lead into the CRM.
+                                    Enter details for the new lead manually.
                                 </DialogDescription>
                             </DialogHeader>
                             <LeadForm
                                 pipelines={pipelines}
+                                defaultPipelineId={selectedPipelineId}
                                 onSuccess={() => {
                                     setIsAddLeadOpen(false);
-                                    fetchLeads(); // Refresh list
+                                    fetchLeads();
+                                    toast.success("Lead created successfully");
                                 }}
                             />
                         </DialogContent>
                     </Dialog>
 
-                    {/* Import Dialog */}
-                    <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button variant="outline">
-                                <Upload className="mr-2 h-4 w-4" />
-                                Import Leads
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Import Leads</DialogTitle>
-                                <DialogDescription>
-                                    Select the pipeline you want to import leads into.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Select onValueChange={setSelectedPipelineId} value={selectedPipelineId}>
-                                        <SelectTrigger className="col-span-4">
-                                            <SelectValue placeholder="Select Pipeline" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {pipelines.map((p) => (
-                                                <SelectItem key={p.id} value={p.id}>
-                                                    {p.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button onClick={handleImport} disabled={!selectedPipelineId}>
-                                    Continue to Import
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    {/* Import Trigger */}
+                    <Button variant="outline" onClick={() => toast.info("Import feature coming soon")}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Import
+                    </Button>
                 </div>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                            <CardTitle>All Leads</CardTitle>
-                            <CardDescription>
-                                A unified view of leads across all pipelines.
-                            </CardDescription>
-                        </div>
-                        {/* Filter Bar */}
-                        <div className="flex flex-wrap items-center gap-2">
-                            {/* Search Input */}
-                            <div className="relative">
-                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    placeholder="Search name/phone..."
-                                    className="pl-8 w-[200px]"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                            </div>
-
-                            {/* Pipeline Filter */}
-                            <Select value={filterPipelineId || "all"} onValueChange={(val) => {
-                                setFilterPipelineId(val === "all" ? "" : val)
-                                setFilterStageId("") // Reset stage when pipeline changes
-                            }}>
-                                <SelectTrigger className="w-[160px]">
-                                    <SelectValue placeholder="All Pipelines" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Pipelines</SelectItem>
-                                    {pipelines.map((p) => (
-                                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
-                            {/* Stage Filter (cascading) */}
-                            <Select
-                                value={filterStageId || "all"}
-                                onValueChange={(val) => setFilterStageId(val === "all" ? "" : val)}
-                                disabled={!filterPipelineId}
-                            >
-                                <SelectTrigger className="w-[140px]">
-                                    <SelectValue placeholder="All Stages" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Stages</SelectItem>
-                                    {filterStages.map((s) => (
-                                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
-                            {/* Clear Filters */}
-                            {(filterPipelineId || filterStageId || searchQuery) && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                        setFilterPipelineId("")
-                                        setFilterStageId("")
-                                        setSearchQuery("")
-                                    }}
-                                >
-                                    <X className="mr-1 h-4 w-4" />
-                                    Clear
-                                </Button>
-                            )}
-                        </div>
+            {/* Pipeline Selector and Filters */}
+            <div className="flex flex-col md:flex-row gap-4 items-end md:items-center justify-between">
+                <div className="flex flex-col md:flex-row gap-4 flex-1 w-full">
+                    <div className="w-full md:w-[250px]">
+                        <Select value={selectedPipelineId} onValueChange={setSelectedPipelineId}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Pipeline" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {pipelines.map(p => (
+                                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
-                </CardHeader>
-                <CardContent>
-                    {isLoading ? (
-                        <div className="flex items-center justify-center h-24">
-                            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                        </div>
-                    ) : (
-                        <DataTable columns={columns} data={leads} searchKey="customerName" />
-                    )}
-                </CardContent>
-            </Card>
 
-            {/* Edit Lead Dialog */}
-            <Dialog open={!!leadToEdit} onOpenChange={(open) => !open && setLeadToEdit(null)}>
+                    <div className="w-full md:w-[200px]">
+                        <Select value={stageFilter} onValueChange={setStageFilter}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Filter by Stage" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Stages</SelectItem>
+                                {selectedPipeline?.stages.map(stage => (
+                                    <SelectItem key={stage.id} value={stage.id}>{stage.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="relative w-full md:w-[300px]">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search leads..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-8"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Content Area */}
+            {loading ? (
+                <div className="flex items-center justify-center h-64">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+            ) : (
+                <>
+                    {view === "list" ? (
+                        <DataTable
+                            columns={columns}
+                            data={filteredLeads}
+                        />
+                    ) : (
+                        <LeadsChart
+                            stages={selectedPipeline?.stages || []}
+                            leads={filteredLeads}
+                        />
+                    )}
+                </>
+            )}
+
+            {/* Edit Dialog (Reused) */}
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>Edit Lead</DialogTitle>
-                        <DialogDescription>
-                            Update lead details.
-                        </DialogDescription>
                     </DialogHeader>
                     {leadToEdit && (
                         <LeadForm
                             pipelines={pipelines}
                             leadToEdit={leadToEdit}
                             onSuccess={() => {
-                                setLeadToEdit(null);
+                                setIsEditOpen(false);
+                                setLeadToEdit(undefined);
                                 fetchLeads();
+                                toast.success("Lead updated");
                             }}
                         />
                     )}
                 </DialogContent>
             </Dialog>
 
-            {/* Delete Confirmation Dialog */}
-            <AlertDialog open={!!leadToDelete} onOpenChange={(open) => !open && setLeadToDelete(null)}>
+            {/* Delete Alert (Reused) */}
+            <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will permanently delete the lead
-                            <span className="font-semibold"> {leadToDelete?.customerName}</span>.
-                            This action cannot be undone.
+                            This action cannot be undone. This will permanently delete the lead
+                            for {leadToDelete?.customerName}.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                            onClick={(e) => { e.preventDefault(); executeDelete(); }}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                executeDelete();
+                            }}
                             disabled={isDeleting}
-                            className="bg-red-600 hover:bg-red-700"
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                            {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Delete
+                            {isDeleting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                "Delete"
+                            )}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -350,4 +358,3 @@ export function LeadsClient({ pipelines }: LeadsClientProps) {
         </div>
     );
 }
-

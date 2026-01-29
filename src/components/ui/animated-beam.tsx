@@ -140,7 +140,7 @@ export const AnimatedBeam = ({
                         y2: "0%",
                     }}
                     animate={{
-                        x1: reverse ? ["100%", "0%"] : ["0%", "100%"],
+                        x1: reverse ? ["90%", "-10%"] : ["-10%", "90%"],
                         x2: reverse ? ["100%", "0%"] : ["0%", "100%"],
                         y1: ["0%", "0%"],
                         y2: ["0%", "0%"],
@@ -148,14 +148,15 @@ export const AnimatedBeam = ({
                     transition={{
                         delay,
                         duration,
-                        ease: [0.16, 1, 0.3, 1], // https://easings.net/#easeOutExpo
+                        ease: "linear",
                         repeat: Infinity,
                         repeatDelay: 0,
                     }}
                 >
                     <stop stopColor={gradientStartColor} stopOpacity="0"></stop>
-                    <stop stopColor={gradientStartColor}></stop>
-                    <stop offset="32.5%" stopColor={gradientStopColor}></stop>
+                    <stop offset="5%" stopColor={gradientStartColor}></stop>
+                    <stop offset="50%" stopColor={gradientStopColor}></stop>
+                    <stop offset="95%" stopColor={gradientStopColor}></stop>
                     <stop offset="100%" stopColor={gradientStopColor} stopOpacity="0"></stop>
                 </motion.linearGradient>
             </defs>

@@ -48,19 +48,20 @@ interface LeadFormProps {
     pipelines: { id: string, name: string, stages: { id: string, name: string }[] }[];
     onSuccess: () => void;
     leadToEdit?: LeadToEdit;
+    defaultPipelineId?: string;
 }
 
-export function LeadForm({ pipelines, onSuccess, leadToEdit }: LeadFormProps) {
+export function LeadForm({ pipelines, onSuccess, leadToEdit, defaultPipelineId }: LeadFormProps) {
     const [isLoading, setIsLoading] = useState(false)
     const isEditing = !!leadToEdit
 
-    const form = useForm({
+    const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             customerName: leadToEdit?.customerName || "",
             phone: leadToEdit?.phone || "",
             email: leadToEdit?.email || "",
-            pipelineId: leadToEdit?.pipelineId || "",
+            pipelineId: leadToEdit?.pipelineId || defaultPipelineId || "",
             stageId: leadToEdit?.stageId || "",
             source: leadToEdit?.source || "",
             csNumber: leadToEdit?.csNumber || "",
@@ -91,7 +92,7 @@ export function LeadForm({ pipelines, onSuccess, leadToEdit }: LeadFormProps) {
         try {
             const payload = { ...values }
 
-            const url = isEditing ? `/api/leads/${leadToEdit.id}` : "/api/leads"
+            const url = isEditing && leadToEdit ? `/api/leads/${leadToEdit.id}` : "/api/leads"
             const method = isEditing ? "PUT" : "POST"
 
             const res = await fetch(url, {
@@ -139,9 +140,9 @@ export function LeadForm({ pipelines, onSuccess, leadToEdit }: LeadFormProps) {
                         name="phone"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Phone (WhatsApp)</FormLabel>
+                                <FormLabel>Phone</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="628123..." {...field} />
+                                    <Input placeholder="+62..." {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -152,9 +153,9 @@ export function LeadForm({ pipelines, onSuccess, leadToEdit }: LeadFormProps) {
                         name="email"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>Email (Optional)</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="john@example.com" {...field} />
+                                    <Input placeholder="john@example.com" type="email" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -169,15 +170,24 @@ export function LeadForm({ pipelines, onSuccess, leadToEdit }: LeadFormProps) {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Pipeline</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select
+                                    onValueChange={(value) => {
+                                        field.onChange(value)
+                                        form.setValue("stageId", "") // Reset stage when pipeline changes
+                                    }}
+                                    defaultValue={field.value}
+                                    value={field.value}
+                                >
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select Pipeline" />
+                                            <SelectValue placeholder="Select pipeline" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {pipelines.map(p => (
-                                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                                        {pipelines.map((pipeline) => (
+                                            <SelectItem key={pipeline.id} value={pipeline.id}>
+                                                {pipeline.name}
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -191,17 +201,23 @@ export function LeadForm({ pipelines, onSuccess, leadToEdit }: LeadFormProps) {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Stage</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedPipelineId}>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    value={field.value}
+                                    disabled={!selectedPipelineId}
+                                >
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select Stage" />
+                                            <SelectValue placeholder="Select stage" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {
-                                            activeStages.map((s) => (
-                                                <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                                            ))}
+                                        {activeStages.map((stage) => (
+                                            <SelectItem key={stage.id} value={stage.id}>
+                                                {stage.name}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -210,47 +226,41 @@ export function LeadForm({ pipelines, onSuccess, leadToEdit }: LeadFormProps) {
                     />
                 </div>
 
-                <FormField
-                    control={form.control}
-                    name="source"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Source</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="source"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Source (Optional)</FormLabel>
                                 <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Source" />
-                                    </SelectTrigger>
+                                    <Input placeholder="e.g. Website, Referral" {...field} />
                                 </FormControl>
-                                <SelectContent>
-                                    <SelectItem value="Meta">Meta</SelectItem>
-                                    <SelectItem value="GAds">GAds</SelectItem>
-                                    <SelectItem value="LinkedAds">LinkedAds</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="csNumber"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>CS Number (Optional)</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="CS agent ID/Number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
 
-                <FormField
-                    control={form.control}
-                    name="csNumber"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>No CS</FormLabel>
-                            <FormControl>
-                                <Input placeholder="CS1, CS2, etc." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Save Lead
-                </Button>
+                <div className="flex justify-end gap-2">
+                    <Button type="submit" disabled={isLoading}>
+                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {isEditing ? "Update Lead" : "Create Lead"}
+                    </Button>
+                </div>
             </form>
         </Form>
     )

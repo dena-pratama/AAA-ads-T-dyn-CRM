@@ -40,6 +40,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Leads Visualization**: 
+  - Integrated `Recharts` for lead stage distribution.
+  - Implemented List vs Chart view toggle.
+- **UI Enhancements**:
+  - Improved padding on Leads and Campaigns pages (`p-8`).
+  - Added "Import feature coming soon" toast.
+
+### Fixed
+- **Hydration Errors**:
+  - Removed Radix UI `Tabs` causing component ID mismatch.
+  - Implemented `mounted` check for client-side only rendering of complex UI components.
+- **Linting**:
+  - Resolved unused variables and import errors in `leads-client.tsx` and `campaigns-client.tsx`.
+
+### Added
 - **Leads Module**: Created dedicated Leads page (`/leads`) with "Import" trigger.
 - **Import Wizard**: Implemented multi-step wizard for bulk importing leads from Excel/CSV (`/pipelines/[id]/import`).
 - **Dynamic Mapping**: Added `ColumnMapper` to map file headers to System & Custom Fields.

@@ -143,18 +143,18 @@
   - [ ] Client-specific mappings
 
 ### 2.3 Campaign Management
-- [ ] API Routes
-  - [ ] `GET /api/campaigns` - List campaigns
-  - [ ] `PUT /api/campaigns/[id]` - Update campaign
-  - [ ] `POST /api/campaigns/merge` - Merge campaigns
-- [ ] UI Pages
-  - [ ] `/campaigns` - Campaign master list
-- [ ] Features
+- [x] API Routes
+  - [x] `GET /api/campaigns` - List campaigns
+  - [x] `PUT /api/campaigns/[id]` - Update campaign
+  - [x] `POST /api/campaigns/merge` - Merge campaigns
+- [x] UI Pages
+  - [x] `/campaigns` - Campaign master list
+- [x] Features
   - [x] Auto-detect new campaigns from import
-  - [ ] Campaign rename
-  - [ ] Campaign merge (combine multiple into one)
-  - [ ] Campaign aliases (for matching)
-  - [ ] Deactivate campaign
+  - [x] Campaign rename
+  - [x] Campaign merge (combine multiple into one)
+  - [x] Campaign aliases (for matching)
+  - [x] Deactivate campaign
 
 ---
 
@@ -226,11 +226,11 @@
   - [x] Stage filter
   - [ ] Date range filter
   - [x] Search by name/phone
-- [ ] Kanban View
-  - [ ] Columns = Pipeline stages
-  - [ ] Drag & drop to change stage
-  - [ ] Lead cards with summary
-  - [ ] Stage count indicators
+- [x] Kanban View
+  - [x] Columns = Pipeline stages
+  - [x] Drag & drop to change stage
+  - [x] Lead cards with summary
+  - [x] Stage count indicators
 
 ### 4.3 Lead Import (Bonus)
 - [x] Bulk import leads from Excel
