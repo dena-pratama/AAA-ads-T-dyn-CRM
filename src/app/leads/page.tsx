@@ -9,17 +9,15 @@ export default async function LeadsPage() {
     if (!session?.user) redirect("/login")
 
     // Fetch pipelines for the import selector
-    let whereClause: any = {}
+    const whereClause: { clientId?: string } = {}
     if (session.user.role !== "SUPER_ADMIN") {
         whereClause.clientId = session.user.clientId
     }
 
     const pipelines = await prisma.pipeline.findMany({
         where: whereClause,
-        select: { id: true, name: true }
+        select: { id: true, name: true, stages: true }
     })
 
-    const canManage = session.user.role === "SUPER_ADMIN" || session.user.role === "CLIENT_ADMIN"
-
-    return <LeadsClient pipelines={pipelines} canManage={canManage} />
+    return <LeadsClient pipelines={pipelines} />
 }

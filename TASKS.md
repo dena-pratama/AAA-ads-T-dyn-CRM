@@ -118,34 +118,19 @@
 ## 📥 Phase 2: Ingestion Engine (Day 5-6)
 
 ### 2.1 Smart CSV/Excel Importer
-- [ ] Install SheetJS (xlsx)
-- [ ] API Routes
-  - [ ] `POST /api/import/parse` - Parse uploaded file
-  - [ ] `POST /api/import/execute` - Execute import
-  - [ ] `GET /api/import/history` - Import history
-- [ ] UI Pages
-  - [ ] `/spend/import` - Import wizard
-- [ ] Features
-  - [ ] Step 1: File Upload
-    - [ ] Drag & drop zone
-    - [ ] Support .xlsx, .xls, .csv
-    - [ ] File size validation (max 10MB)
-  - [ ] Step 2: Sheet Selection (for multi-sheet Excel)
-  - [ ] Step 3: Data Preview
-    - [ ] Show first 10 rows
-    - [ ] Column type detection
-  - [ ] Step 4: Column Mapping
-    - [ ] Required: date, campaign_name, spend
-    - [ ] Optional: impressions, clicks, reach
-    - [ ] Platform selection
-    - [ ] Save mapping as template
-  - [ ] Step 5: Validation
-    - [ ] Data type validation
-    - [ ] Duplicate detection
-    - [ ] Error highlighting
-  - [ ] Step 6: Import Execution
-    - [ ] Progress indicator
-    - [ ] Success/error summary
+- [x] Install SheetJS (xlsx)
+- [x] API Routes
+  - [x] `POST /api/spend/import` - Execute import with auto-campaign creation
+  - [x] `GET /api/import/history` - Import history
+- [x] UI Pages
+  - [x] `/spend/import` - Import wizard
+- [x] Features
+  - [x] Step 1: File Upload (Multi-sheet support)
+  - [x] Step 2: Sheet Selection
+  - [x] Step 3: Data Preview
+  - [x] Step 4: Column Mapping (Platform templates)
+  - [x] Step 5: Validation (Zod + Client side)
+  - [x] Step 6: Import Execution
 
 ### 2.2 Mapping Configuration
 - [ ] API Routes
@@ -165,7 +150,7 @@
 - [ ] UI Pages
   - [ ] `/campaigns` - Campaign master list
 - [ ] Features
-  - [ ] Auto-detect new campaigns from import
+  - [x] Auto-detect new campaigns from import
   - [ ] Campaign rename
   - [ ] Campaign merge (combine multiple into one)
   - [ ] Campaign aliases (for matching)
@@ -219,28 +204,28 @@
 
 ### 4.1 Lead Entry Form
 - [ ] API Routes
-  - [ ] `POST /api/leads` - Create lead
-  - [ ] `GET /api/leads` - List leads
-  - [ ] `PUT /api/leads/[id]` - Update lead
+  - [x] `POST /api/leads` - Create lead
+  - [x] `GET /api/leads` - List leads
+  - [x] `PUT /api/leads/[id]` - Update lead
   - [ ] `PUT /api/leads/[id]/stage` - Update stage
-  - [ ] `DELETE /api/leads/[id]` - Delete lead
+  - [x] `DELETE /api/leads/[id]` - Delete lead
 - [ ] UI Pages
   - [x] `/leads` - Lead list/kanban (Placeholder + Import Trigger)
-  - [ ] `/leads/new` - Lead entry form
+  - [x] `/leads/new` - Lead entry form
   - [ ] `/leads/[id]` - Lead detail
-- [ ] Features
-  - [ ] Campaign source dropdown (from AdSpendLog)
-  - [ ] Dynamic form fields (from Pipeline config)
-  - [ ] Stage selection buttons
+- [x] Features
+  - [x] Source dropdown (Meta, GAds, LinkedAds)
+  - [x] CS Number field for tracking CS assignments
+  - [x] Stage selection from pipeline
   - [ ] Quick notes
   - [ ] Revenue/value input
 
 ### 4.2 Lead Views
-- [ ] List View
-  - [ ] DataTable with all leads
-  - [ ] Stage filter
+- [x] List View
+  - [x] DataTable with all leads
+  - [x] Stage filter
   - [ ] Date range filter
-  - [ ] Search by name/phone
+  - [x] Search by name/phone
 - [ ] Kanban View
   - [ ] Columns = Pipeline stages
   - [ ] Drag & drop to change stage

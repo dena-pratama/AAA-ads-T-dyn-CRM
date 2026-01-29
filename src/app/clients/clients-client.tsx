@@ -5,8 +5,10 @@ import { DataTable } from "@/components/ui/data-table";
 import { Client, getColumns } from "./columns";
 import { ClientDialog } from "@/components/clients/client-dialog";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 import {
     AlertDialog,
     AlertDialogAction,
@@ -74,9 +76,17 @@ export function ClientsClient({ data, canManage = false }: ClientsClientProps) {
 
     return (
         <>
+            <div className="flex items-center gap-4 mb-4">
+                <Button variant="ghost" size="icon" asChild>
+                    <Link href="/dashboard">
+                        <ArrowLeft className="h-4 w-4" />
+                    </Link>
+                </Button>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Client Management</h2>
+            </div>
+
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Client Management</h1>
                     <p className="text-slate-500 dark:text-slate-400">Manage your tenants and client accounts</p>
                 </div>
 

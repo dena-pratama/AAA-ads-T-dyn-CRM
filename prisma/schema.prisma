@@ -251,6 +251,7 @@ model Lead {
   // Status
   status        LeadStatus  @default(ACTIVE)
   notes         String?
+  csNumber      String?     // CS (Customer Service) number handling this lead
   
   // Lead date (separate from createdAt)
   leadDate      DateTime    @default(now())

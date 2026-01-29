@@ -25,7 +25,7 @@
 
 ### Upcoming Features
 
-- 📥 **Smart CSV Import**: Upload & mapping data iklan dari berbagai platform.
+- 📥 **Smart CSV Import**: Upload & mapping data iklan dari berbagai platform (Meta, Google, TikTok).
 - 📊 **Excel-Like Grid**: Edit data inline seperti spreadsheet.
 - 🔄 **Dynamic Pipeline**: Custom alur bisnis per klien.
 - 📈 **Real-Time Analytics**: CPPL, ROAS, dan metrik kustom.

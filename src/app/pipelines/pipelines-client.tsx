@@ -4,7 +4,7 @@
 import { useState } from "react"
 import { Pipeline, getColumns } from "./columns"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import {
     AlertDialog,
@@ -46,16 +46,17 @@ export function PipelinesClient({ data, canManage = false }: PipelinesClientProp
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center gap-4 mb-2">
-                <Button variant="outline" size="sm" asChild>
+            <div className="flex items-center gap-4 mb-4">
+                <Button variant="ghost" size="icon" asChild>
                     <Link href="/dashboard">
-                        ← Back to Dashboard
+                        <ArrowLeft className="h-4 w-4" />
                     </Link>
                 </Button>
+                <h2 className="text-3xl font-bold tracking-tight">Pipelines</h2>
             </div>
+
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Pipelines</h2>
                     <p className="text-muted-foreground">
                         Manage your CRM pipelines and stages.
                     </p>

@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] - 2026-01-29
+
+### Added
+- **Lead Form Enhancements**:
+  - Replaced "Value (IDR)" field with "Source" dropdown (Meta, GAds, LinkedAds).
+  - Added "No CS" field to track which Customer Service handles each lead.
+  - Added `csNumber` column to Lead database model.
+  
+### Fixed
+- **Leads CRUD Operations**:
+  - Fixed `clientId: null` error for SUPER_ADMIN users by resolving clientId from selected pipeline.
+  - Fixed Next.js 15+ `params` Promise handling in dynamic API routes.
+  - Improved auth checks to allow SUPER_ADMIN access without clientId requirement.
+  - Added detailed error messages for better debugging.
+
+---
+
+## [0.4.0] - 2026-01-29
+
+### Added
+- **Ad Spend Import Module**:
+  - New `/spend` page as dashboard for ad costs.
+  - New `/spend/import` wizard for bulk uploading Excel/CSV files.
+  - **Multi-sheet Support**: Ability to select specific sheets from Excel workbooks.
+  - **Platform Detection**: Tag imports as Meta, Google, or TikTok.
+  - **Auto-Campaign Creation**: Importing spend for a new campaign auto-creates it in DB.
+- **Backend**:
+  - `POST /api/spend/import`: Robust endpoint with Zod validation.
+  - `xlsx` library integration.
+
 ## [Unreleased]
 
 ### Added
