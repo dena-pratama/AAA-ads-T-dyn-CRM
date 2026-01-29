@@ -2,7 +2,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
-import { PipelineForm } from "@/components/pipelines/pipeline-form"
+import { PipelineDetailTabs } from "@/components/pipelines/pipeline-detail-tabs"
 import { pipelineSchema } from "@/lib/validators/pipeline"
 import { z } from "zod"
 
@@ -40,8 +40,8 @@ export default async function EditPipelinePage({ params }: { params: Promise<{ i
 
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
-            <PipelineForm
-                initialData={formattedData}
+            <PipelineDetailTabs
+                pipeline={formattedData}
                 isSuperAdmin={session.user.role === "SUPER_ADMIN"}
                 readOnly={session.user.role !== "SUPER_ADMIN"}
                 clients={clients}

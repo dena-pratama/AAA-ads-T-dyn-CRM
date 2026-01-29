@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Leads Module**: Created dedicated Leads page (`/leads`) with "Import" trigger.
+- **Import Wizard**: Implemented multi-step wizard for bulk importing leads from Excel/CSV (`/pipelines/[id]/import`).
+- **Dynamic Mapping**: Added `ColumnMapper` to map file headers to System & Custom Fields.
+- **Bulk API**: Created optimized API using `prisma.$transaction` and `createMany` logic for fast data insertion.
+- **Dashboard**: Integrated Leads entry point in the main Dashboard.
+
+### Changed
+- **Pipeline Details**: Refactored to use Tabs (Leads vs Settings) - *Reverted to keep Settings clean, moved Leads to specialized page*.
+- **Navigation**: Added "Back to Dashboard" button on Leads page for better UX.
+
+### Fixed
+- **Pipeline Access**: Fixed `async params` issue in Next.js 16 dynamic routes.
+- **UI Consistency**: Standardized `AnimatedBeam` and specific UI elements.
+
 ### 🚀 Added
 - Initial project repository setup
 - Comprehensive `.gitignore` for Next.js + Prisma + Docker

@@ -39,7 +39,12 @@ export const getColumns = ({ onDelete, canManage }: PipelineColumnsProps): Colum
         header: "Pipeline Name",
         cell: ({ row }) => (
             <div className="flex flex-col">
-                <span className="font-medium">{row.getValue("name")}</span>
+                <Link
+                    href={`/pipelines/${row.original.id}/flow`}
+                    className="font-medium hover:underline hover:text-blue-500 transition-colors"
+                >
+                    {row.getValue("name")}
+                </Link>
                 <span className="text-xs text-muted-foreground truncate max-w-[200px]">
                     {row.original.description}
                 </span>
