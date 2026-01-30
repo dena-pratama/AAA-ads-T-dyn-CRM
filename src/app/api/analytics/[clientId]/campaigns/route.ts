@@ -43,7 +43,7 @@ export async function GET(
         const { startDate, endDate, platform } = query.data;
 
         // Date filter
-        const dateFilter: any = {};
+        const dateFilter: Record<string, any> = {};
         if (startDate && endDate) {
             dateFilter.date = {
                 gte: new Date(startDate),
@@ -52,7 +52,7 @@ export async function GET(
         }
 
         // Platform filter
-        const platformFilter: any = {};
+        const platformFilter: Record<string, any> = {};
         if (platform && platform !== "all") {
             platformFilter.platform = platform;
         }
@@ -72,12 +72,15 @@ export async function GET(
             },
         });
 
-        // 2. Get Leads Count per Campaign (Join via campaignName or campaignId if linked)
-        // Since we group by campaignName from spend logs, we try to match leads by campaignName
-        // Note: Ideally leads are linked to Campaign Model, but imported spend logs might just have raw names.
-        // We will match by campaignName for simplicity of this view.
+        // 2. Get Default Pipeline for Stage Metadata
+        const pipeline = await prisma.pipeline.findFirst({
+            where: { clientId, isDefault: true },
+            select: { stages: true }
+        });
 
-        // Fetch leads directly
+        const stages = (pipeline?.stages as any[]) || [];
+
+        // 3. Get Leads Count per Campaign AND Stage
         const leadFilter: any = {};
         if (startDate && endDate) {
             leadFilter.leadDate = {
@@ -87,38 +90,58 @@ export async function GET(
         }
 
         const leadsData = await prisma.lead.groupBy({
-            by: ["campaignName"],
+            by: ["campaignName", "currentStage"],
             where: {
                 clientId,
-                ...leadFilter, // Leads date filter
-                // If platform filter is on, we might need to filter leads by source too if available
-                // But currently Lead model relies on campaignName to match.
+                ...leadFilter,
             },
             _count: {
                 id: true
+            },
+            _sum: {
+                value: true
             }
         });
 
-        // Map leads to a dictionary for fast lookup
-        const leadsMap: Record<string, number> = {};
-        leadsData.forEach((item) => {
-            if (item.campaignName) {
-                leadsMap[item.campaignName] = item._count.id;
+        // Map leads to a nested dictionary: campaignName -> { total: X, revenue: Y, stages: { stageId: count } }
+        type LeadStat = {
+            count: number;
+            revenue: number;
+            byStage: Record<string, number>;
+        };
+        const leadsMap: Record<string, LeadStat> = {};
+
+        leadsData.forEach((item: any) => {
+            if (!item.campaignName) return;
+
+            if (!leadsMap[item.campaignName]) {
+                leadsMap[item.campaignName] = { count: 0, revenue: 0, byStage: {} };
+            }
+
+            const stat = leadsMap[item.campaignName];
+            stat.count += item._count.id;
+            stat.revenue += Number(item._sum.value || 0);
+
+            if (item.currentStage) {
+                stat.byStage[item.currentStage] = (stat.byStage[item.currentStage] || 0) + item._count.id;
             }
         });
 
-        // 3. Merge and Calculate Metrics
-        const campaignStats = spendData.map((item) => {
+        // 4. Merge and Calculate Metrics
+        const campaignStats = spendData.map((item: any) => {
             const name = item.campaignName;
             const spend = Number(item._sum.spend || 0);
             const impressions = Number(item._sum.impressions || 0);
             const clicks = Number(item._sum.clicks || 0);
-            const leads = leadsMap[name] || 0;
+
+            const leadStat = leadsMap[name] || { count: 0, revenue: 0, byStage: {} };
+            const leads = leadStat.count;
+            const revenue = leadStat.revenue;
 
             const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
             const cpc = clicks > 0 ? spend / clicks : 0;
             const cpl = leads > 0 ? spend / leads : 0;
-            const roas = 0; // Placeholder until revenue is tracked
+            const roas = spend > 0 ? revenue / spend : 0;
 
             return {
                 id: `${name}-${item.platform}`, // composite key
@@ -128,17 +151,22 @@ export async function GET(
                 impressions,
                 clicks,
                 leads,
+                revenue,
                 ctr,
                 cpc,
                 cpl,
-                roas
+                roas,
+                breakdown: leadStat.byStage // Pass stage breakdown
             };
         });
 
         // Sorting (Default by Spend Desc)
-        campaignStats.sort((a, b) => b.spend - a.spend);
+        campaignStats.sort((a: any, b: any) => b.spend - a.spend);
 
-        return NextResponse.json(campaignStats);
+        return NextResponse.json({
+            stats: campaignStats,
+            stages: stages // Return stage metadata for UI columns
+        });
 
     } catch (error) {
         console.error("[ANALYTICS_CAMPAIGNS_GET]", error);

@@ -102,10 +102,36 @@ export const columns: ColumnDef<CampaignStat>[] = [
 
 interface CampaignPerformanceTableProps {
     data: CampaignStat[]
+    stages?: { id: string; name: string; color: string }[]
 }
 
-export function CampaignPerformanceTable({ data }: CampaignPerformanceTableProps) {
+export function CampaignPerformanceTable({ data, stages = [] }: CampaignPerformanceTableProps) {
+    // Create dynamic columns for stages
+    const stageColumns: ColumnDef<CampaignStat>[] = stages.map((stage) => ({
+        id: `stage_${stage.id}`,
+        header: stage.name,
+        accessorFn: (row) => {
+            // Access nested breakdown if available
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const breakdown = (row as any).breakdown || {};
+            return breakdown[stage.id] || 0;
+        },
+        cell: ({ getValue }) => (
+            <div className="text-center font-medium text-slate-600 dark:text-slate-400">
+                {formatNumber(getValue() as number)}
+            </div>
+        ),
+    }));
+
+    // Combine standard columns with dynamic stage columns
+    // Insert stage columns after "Leads" (index 7)
+    const tableColumns = [
+        ...columns.slice(0, 8),
+        ...stageColumns,
+        ...columns.slice(8),
+    ];
+
     return (
-        <DataTable columns={columns} data={data} searchKey="name" />
+        <DataTable columns={tableColumns} data={data} searchKey="name" />
     )
 }

@@ -18,6 +18,8 @@ const METRIC_PRESETS = {
         { id: "cpm", label: "CPM", formula: "spend/impressions*1000", format: "currency", visible: true, order: 7 },
         { id: "leads", label: "Total Leads", formula: "count:leads", format: "number", visible: true, order: 8 },
         { id: "cpl", label: "Cost Per Lead", formula: "spend/leads", format: "currency", visible: true, order: 9 },
+        { id: "revenue", label: "Total Revenue", formula: "sum:revenue", format: "currency", visible: true, order: 10 },
+        { id: "roas", label: "ROAS (x)", formula: "revenue/spend", format: "number", visible: true, order: 11 },
     ],
     GOOGLE: [
         { id: "spend", label: "Total Cost", formula: "sum:spend", format: "currency", visible: true, order: 1 },
@@ -26,7 +28,8 @@ const METRIC_PRESETS = {
         { id: "ctr", label: "CTR", formula: "clicks/impressions*100", format: "percent", visible: true, order: 4 },
         { id: "cpc", label: "CPC", formula: "spend/clicks", format: "currency", visible: true, order: 5 },
         { id: "conversions", label: "Conversions", formula: "count:conversions", format: "number", visible: true, order: 6 },
-        { id: "roas", label: "ROAS", formula: "revenue/spend", format: "number", visible: true, order: 7 },
+        { id: "roas", label: "ROAS (x)", formula: "revenue/spend", format: "number", visible: true, order: 7 },
+        { id: "revenue", label: "Total Revenue", formula: "sum:revenue", format: "currency", visible: true, order: 8 },
     ],
     TIKTOK: [
         { id: "spend", label: "Total Spend", formula: "sum:spend", format: "currency", visible: true, order: 1 },
@@ -35,11 +38,15 @@ const METRIC_PRESETS = {
         { id: "reach", label: "Reach", formula: "sum:reach", format: "number", visible: true, order: 4 },
         { id: "ctr", label: "CTR", formula: "clicks/impressions*100", format: "percent", visible: true, order: 5 },
         { id: "cpc", label: "CPC", formula: "spend/clicks", format: "currency", visible: true, order: 6 },
+        { id: "revenue", label: "Total Revenue", formula: "sum:revenue", format: "currency", visible: true, order: 7 },
+        { id: "roas", label: "ROAS (x)", formula: "revenue/spend", format: "number", visible: true, order: 8 },
     ],
     CUSTOM: [
         { id: "spend", label: "Total Ad Spent", formula: "sum:spend", format: "currency", visible: true, order: 1 },
         { id: "leads", label: "Total Leads", formula: "count:leads", format: "number", visible: true, order: 2 },
         { id: "cpl", label: "Cost Per Lead", formula: "spend/leads", format: "currency", visible: true, order: 3 },
+        { id: "revenue", label: "Total Revenue", formula: "sum:revenue", format: "currency", visible: true, order: 4 },
+        { id: "roas", label: "ROAS (x)", formula: "revenue/spend", format: "number", visible: true, order: 5 },
     ],
 };
 
@@ -112,11 +119,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             _count: true,
         });
 
-        // Count leads
+        // Count leads and sum revenue
         const leadsWhere: Record<string, unknown> = { clientId };
         if (Object.keys(dateFilter).length > 0) leadsWhere.leadDate = dateFilter;
 
-        const leadsCount = await prisma.lead.count({ where: leadsWhere });
+        const leadsAgg = await prisma.lead.aggregate({
+            where: leadsWhere,
+            _count: true,
+            _sum: {
+                value: true,
+            },
+        });
+
+        const leadsCount = leadsAgg._count || 0;
+        const totalRevenue = Number(leadsAgg._sum.value || 0);
 
         // Get monthly data for charts
         const monthlySpend = await prisma.adSpendLog.groupBy({
@@ -128,14 +144,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         // Process monthly data
         const monthlyData: Record<string, { spend: number; impressions: number; clicks: number }> = {};
-        monthlySpend.forEach((item) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        monthlySpend.forEach((item: any) => {
             const monthKey = new Date(item.date).toISOString().slice(0, 7);
             if (!monthlyData[monthKey]) {
                 monthlyData[monthKey] = { spend: 0, impressions: 0, clicks: 0 };
             }
-            monthlyData[monthKey].spend += item._sum.spend || 0;
-            monthlyData[monthKey].impressions += item._sum.impressions || 0;
-            monthlyData[monthKey].clicks += item._sum.clicks || 0;
+            monthlyData[monthKey].spend += Number(item._sum.spend || 0);
+            monthlyData[monthKey].impressions += Number(item._sum.impressions || 0);
+            monthlyData[monthKey].clicks += Number(item._sum.clicks || 0);
         });
 
         // Monthly leads
@@ -147,7 +164,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         });
 
         const leadsData: Record<string, number> = {};
-        monthlyLeads.forEach((item) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        monthlyLeads.forEach((item: any) => {
             if (item.leadDate) {
                 const monthKey = new Date(item.leadDate).toISOString().slice(0, 7);
                 leadsData[monthKey] = (leadsData[monthKey] || 0) + item._count;
@@ -155,10 +173,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         });
 
         // Calculate metrics
-        const totalSpend = spendAgg._sum.spend || 0;
-        const totalImpressions = spendAgg._sum.impressions || 0;
-        const totalClicks = spendAgg._sum.clicks || 0;
-        const totalReach = spendAgg._sum.reach || 0;
+        const totalSpend = Number(spendAgg._sum.spend || 0);
+        const totalImpressions = Number(spendAgg._sum.impressions || 0);
+        const totalClicks = Number(spendAgg._sum.clicks || 0);
+        const totalReach = Number(spendAgg._sum.reach || 0);
 
         const metrics = {
             spend: totalSpend,
@@ -166,10 +184,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             clicks: totalClicks,
             reach: totalReach,
             leads: leadsCount,
+            revenue: totalRevenue,
             ctr: totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0,
             cpc: totalClicks > 0 ? totalSpend / totalClicks : 0,
             cpm: totalImpressions > 0 ? (totalSpend / totalImpressions) * 1000 : 0,
             cpl: leadsCount > 0 ? totalSpend / leadsCount : 0,
+            roas: totalSpend > 0 ? totalRevenue / Number(totalSpend) : 0,
         };
 
         return NextResponse.json({

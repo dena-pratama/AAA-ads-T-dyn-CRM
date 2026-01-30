@@ -243,15 +243,15 @@
 ### 5.1 Dashboard API
 - [x] API Routes
   - [x] `GET /api/analytics/overview` - Summary metrics (Implemented as `/api/analytics/[clientId]`)
-  - [ ] `GET /api/analytics/campaigns` - Per-campaign breakdown
+  - [x] `GET /api/analytics/campaigns` - Per-campaign breakdown (Implemented as `/api/analytics/[clientId]/campaigns`)
   - [x] `GET /api/analytics/trends` - Time-series data (Implemented in main endpoint)
 - [x] Aggregation Queries
   - [x] Total Spend
   - [x] Total Leads
-  - [ ] Leads per stage
-  - [ ] Total Revenue (Value)
-  - [ ] CPPL (Cost Per Potential Lead)
-  - [ ] ROAS (Return on Ad Spend)
+  - [x] Leads per stage
+  - [x] Total Revenue (Value)
+  - [x] CPPL (Cost Per Potential Lead)
+  - [x] ROAS (Return on Ad Spend)
   - [x] CPL (Cost Per Lead)
 
 ### 5.2 Dashboard UI
@@ -262,8 +262,8 @@
   - [x] Metric cards (with trend indicators)
   - [x] Campaign performance table
   - [x] Spend vs Revenue chart (Area/Bar charts implemented)
-  - [ ] Lead funnel visualization
-  - [ ] Stage distribution (pie/donut)
+  - [x] Lead funnel visualization
+  - [x] Stage distribution (pie/donut)
 - [x] Features
   - [x] Date range picker
   - [x] Client selector (Analytics Sidebar)
@@ -276,8 +276,8 @@
   - [x] Fixed: Data Table Columns Button (Human-readable labels)
 
 ### 5.3 Dynamic Columns
-- [ ] Table columns adjust based on Pipeline stages
-- [ ] Show lead count per stage
+- [x] Table columns adjust based on Pipeline stages
+- [x] Show lead count per stage
 - [ ] Conversion rate between stages
 
 ---

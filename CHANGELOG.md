@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.0] - 2026-01-31
+
+### Added
+- **Dynamic Campaign Analytics**:
+  - **Dynamic Table Columns**: Campaign performance table now adapts columns based on the Client's Pipeline Stages.
+  - **Stage-Specific Metrics**: Leads are now counted and displayed per pipeline stage (e.g., "New Lead", "Contacted", "Closing").
+  - **Advanced Financial Metrics**:
+    - **Real ROAS**: Return on Ad Spend calculated from `Revenue / Spend`.
+    - **Revenue Tracking**: Aggregated from Lead values.
+    - **CPPL**: Cost Per Potential Lead tracking.
+  - **API Enhancements**: `/api/analytics/[clientId]/campaigns` now returns `stages` metadata and nested `breakdown` stats.
+
+### Fixed
+- **Build & Types**:
+  - Resolved `any` type errors in Analytics API routes.
+  - Fixed build failures related to `prisma.config.ts`.
+  - Restored `AnalyticsClient` functionality after accidental code truncation.
+
+---
+
 ## [0.5.0] - 2026-01-29
 
 ### Added
@@ -53,8 +73,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed unused imports and variables in Client modules.
 
 ## [Unreleased]
-
 ### Added
+- **Advanced Analytics**:
+  - **Revenue & ROAS**: Real-time calculation of Return on Ad Spend and Total Revenue from leads.
+  - **Dashboard Settings**: New configuration dialog to Show/Hide specific metrics and charts per client.
+  - **New Metrics**: Added support for CPPL (Cost Per Potential Lead) and expanded financial metrics.
 - **Leads Visualization**: 
   - Integrated `Recharts` for lead stage distribution.
   - Implemented List vs Chart view toggle.

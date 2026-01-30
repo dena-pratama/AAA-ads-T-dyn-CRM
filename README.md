@@ -22,6 +22,7 @@
 - 🎨 **Modern UI/UX**: Desain Glassmorphism yang bersih dengan dukungan **Dark/Light Mode** penuh.
 - 👥 **User Management**: Manajemen pengguna terpusat dengan role yang fleksibel.
 - 📊 **Interactive Analytics**: Dashboard performa iklan dengan filter multi-platform (Meta, Google, TikTok) dan fitur export laporan.
+- 📈 **Advanced Metrics**: Real-Time CPPL, ROAS, dan Revenue tracking dengan Dynamic Column support.
 - 📱 **Responsive Design**: Tampilan optimal di desktop dan mobile.
 
 ### Upcoming Features
@@ -29,7 +30,6 @@
 - 📥 **Smart CSV Import**: Upload & mapping data iklan dari berbagai platform (Meta, Google, TikTok).
 - 📊 **Excel-Like Grid**: Edit data inline seperti spreadsheet.
 - 🔄 **Dynamic Pipeline**: Custom alur bisnis per klien.
-- 📈 **Real-Time Analytics**: CPPL, ROAS, dan metrik kustom.
 
 ---
 

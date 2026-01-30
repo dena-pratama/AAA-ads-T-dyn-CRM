@@ -19,7 +19,6 @@ import {
     DollarSign,
     Users,
     Target,
-    PieChart,
     Download,
     ChevronLeft,
 } from "lucide-react";
@@ -38,6 +37,7 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { CampaignPerformanceTable } from "./campaign-table";
+import { AnalyticsSettings } from "./analytics-settings";
 
 interface Client {
     id: string;
@@ -54,6 +54,7 @@ interface CampaignStat {
     impressions: number;
     clicks: number;
     leads: number;
+    revenue: number;
     ctr: number;
     cpc: number;
     cpl: number;
@@ -122,6 +123,8 @@ export function AnalyticsClient({ client, clients = [], isSuperAdmin = false }: 
     const [dateRange, setDateRange] = useState<string>("6m");
 
     const [campaignStats, setCampaignStats] = useState<CampaignStat[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [stages, setStages] = useState<any[]>([]);
 
     useEffect(() => {
         fetchData();
@@ -155,10 +158,20 @@ export function AnalyticsClient({ client, clients = [], isSuperAdmin = false }: 
             if (!resOverview.ok) throw new Error("Failed to fetch overview");
 
             const jsonOverview = await resOverview.json();
-            const jsonCampaigns = resCampaigns.ok ? await resCampaigns.json() : [];
+            const jsonCampaignsResponse = resCampaigns.ok ? await resCampaigns.json() : { stats: [], stages: [] };
+
+            // Handle both legacy (array) and new (object) response formats
+            const campaignsData = Array.isArray(jsonCampaignsResponse)
+                ? jsonCampaignsResponse
+                : jsonCampaignsResponse.stats || [];
+
+            const stagesData = !Array.isArray(jsonCampaignsResponse)
+                ? jsonCampaignsResponse.stages || []
+                : [];
 
             setData(jsonOverview);
-            setCampaignStats(jsonCampaigns);
+            setCampaignStats(campaignsData);
+            setStages(stagesData);
         } catch (error) {
             toast.error("Failed to load analytics data");
             console.error(error);
@@ -216,102 +229,149 @@ export function AnalyticsClient({ client, clients = [], isSuperAdmin = false }: 
             <div className="flex">
                 {/* Sidebar - KPI Cards */}
                 <aside className="w-64 min-h-screen bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-6">
-                    {/* Client Selector (Super Admin) or Logo */}
-                    {/* Client Selector (Super Admin) or Logo */}
-                    {/* Client Selector (Super Admin) or Logo */}
                     <div className="mb-8">
-                        {isSuperAdmin && clients.length > 0 ? (
-                            <>
-                                <Select
-                                    value={client.id}
-                                    onValueChange={(val) => router.push(`/analytics/${val}`)}
-                                >
-                                    <SelectTrigger className="w-full h-12 bg-white dark:bg-slate-950">
-                                        <div className="flex items-center gap-2 text-left overflow-hidden">
-                                            {client.logo ? (
-                                                /* eslint-disable-next-line @next/next/no-img-element */
-                                                <img src={client.logo} alt={client.name} className="w-6 h-6 rounded object-cover flex-shrink-0" />
-                                            ) : (
-                                                <div className="w-6 h-6 rounded bg-amber-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                                    {client.name.charAt(0)}
-                                                </div>
-                                            )}
-                                            <span className="font-semibold truncate">{client.name}</span>
-                                        </div>
-                                    </SelectTrigger>
-                                    <SelectContent className="z-[9999] max-h-[300px]">
-                                        {clients.map(c => (
-                                            <SelectItem key={c.id} value={c.id}>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-5 h-5 rounded bg-slate-200 flex items-center justify-center text-xs font-medium flex-shrink-0">
-                                                        {c.name.charAt(0)}
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex-1 mr-2">
+                                {isSuperAdmin && clients.length > 0 ? (
+                                    <Select
+                                        value={client.id}
+                                        onValueChange={(val) => router.push(`/analytics/${val}`)}
+                                    >
+                                        <SelectTrigger className="w-full h-10 bg-white dark:bg-slate-950">
+                                            <div className="flex items-center gap-2 text-left overflow-hidden">
+                                                {client.logo ? (
+                                                    /* eslint-disable-next-line @next/next/no-img-element */
+                                                    <img src={client.logo} alt={client.name} className="w-5 h-5 rounded object-cover flex-shrink-0" />
+                                                ) : (
+                                                    <div className="w-5 h-5 rounded bg-amber-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+                                                        {client.name.charAt(0)}
                                                     </div>
-                                                    <span className="truncate">{c.name}</span>
-                                                </div>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {isSuperAdmin && (
-                                    <p className="text-[10px] text-muted-foreground mt-1 ml-1">
-                                        {clients.length} Clients Available
-                                    </p>
-                                )}
-                            </>
-                        ) : (
-                            <div className="flex items-center gap-3">
-                                {client.logo ? (
-                                    /* eslint-disable-next-line @next/next/no-img-element */
-                                    <img src={client.logo} alt={client.name} className="w-10 h-10 rounded-lg object-cover" />
+                                                )}
+                                                <span className="font-semibold truncate text-sm">{client.name}</span>
+                                            </div>
+                                        </SelectTrigger>
+                                        <SelectContent className="z-[9999] max-h-[300px]">
+                                            {clients.map(c => (
+                                                <SelectItem key={c.id} value={c.id}>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-5 h-5 rounded bg-slate-200 flex items-center justify-center text-xs font-medium flex-shrink-0">
+                                                            {c.name.charAt(0)}
+                                                        </div>
+                                                        <span className="truncate">{c.name}</span>
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 ) : (
-                                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white font-bold">
-                                        {client.name.charAt(0)}
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white font-bold">
+                                            {client.name.charAt(0)}
+                                        </div>
+                                        <span className="font-semibold text-lg">{client.name}</span>
                                     </div>
                                 )}
-                                <span className="font-semibold text-lg">{client.name}</span>
                             </div>
+
+                            {/* SETTINGS BUTTON */}
+                            <AnalyticsSettings
+                                metrics={data?.config?.metrics || []}
+                                onSave={(newMetrics) => {
+                                    if (data) {
+                                        setData({
+                                            ...data,
+                                            config: { ...data.config, metrics: newMetrics }
+                                        });
+                                    }
+                                }}
+                            />
+                        </div>
+                        {isSuperAdmin && clients.length > 0 && (
+                            <p className="text-[10px] text-muted-foreground ml-1">
+                                {clients.length} Clients Available
+                            </p>
                         )}
                     </div>
 
                     {/* KPI Cards */}
                     <div className="space-y-4">
-                        <KPICard
-                            label="TOTAL AD SPENT"
-                            value={formatCurrency(metrics.spend || 0)}
-                            icon={<DollarSign className="h-4 w-4" />}
-                        />
-                        <KPICard
-                            label="TOTAL LEADS"
-                            value={formatNumber(metrics.leads || 0)}
-                            icon={<Users className="h-4 w-4" />}
-                        />
-                        <KPICard
-                            label="IMPRESSIONS"
-                            value={formatNumber(metrics.impressions || 0)}
-                            icon={<Target className="h-4 w-4" />}
-                        />
-                        <KPICard
-                            label="CLICKS"
-                            value={formatNumber(metrics.clicks || 0)}
-                            icon={<PieChart className="h-4 w-4" />}
-                        />
+                        {/* Financials Row */}
+                        {data?.config.metrics.find(m => m.id === "revenue")?.visible && (
+                            <KPICard
+                                label="TOTAL REVENUE"
+                                value={formatCurrency(metrics.revenue || 0)}
+                                icon={<DollarSign className="h-4 w-4 text-green-500" />}
+                                className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900"
+                            />
+                        )}
 
-                        <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4">
+                        {data?.config.metrics.find(m => m.id === "roas")?.visible && (
                             <KPICard
-                                label="CTR"
-                                value={formatPercent(metrics.ctr || 0)}
-                                trend={(metrics.ctr || 0) > 1 ? "up" : "down"}
+                                label="ROAS (Return On Ad Spend)"
+                                value={`${(metrics.roas || 0).toFixed(2)}x`}
+                                icon={<TrendingUp className="h-4 w-4 text-blue-500" />}
+                                trend={(metrics.roas || 0) > 1 ? "up" : "down"}
                             />
+                        )}
+
+                        <div className="h-px bg-slate-200 dark:bg-slate-800 my-4" />
+
+                        {data?.config.metrics.find(m => m.id === "spend")?.visible && (
                             <KPICard
-                                label="COST PER CLICK"
-                                value={formatCurrency(metrics.cpc || 0)}
-                                className="mt-4"
+                                label="TOTAL AD SPENT"
+                                value={formatCurrency(metrics.spend || 0)}
+                                icon={<DollarSign className="h-4 w-4" />}
                             />
+                        )}
+                        {data?.config.metrics.find(m => m.id === "leads")?.visible && (
                             <KPICard
-                                label="COST PER LEAD"
-                                value={formatCurrency(metrics.cpl || 0)}
-                                className="mt-4"
+                                label="TOTAL LEADS"
+                                value={formatNumber(metrics.leads || 0)}
+                                icon={<Users className="h-4 w-4" />}
                             />
+                        )}
+
+                        {/* Secondary Metrics */}
+                        <div className="grid grid-cols-2 gap-2">
+                            {data?.config.metrics.find(m => m.id === "impressions")?.visible && (
+                                <KPICard
+                                    label="IMPRESSIONS"
+                                    value={formatNumber(metrics.impressions || 0)}
+                                    compact
+                                />
+                            )}
+                            {data?.config.metrics.find(m => m.id === "clicks")?.visible && (
+                                <KPICard
+                                    label="CLICKS"
+                                    value={formatNumber(metrics.clicks || 0)}
+                                    compact
+                                />
+                            )}
+                        </div>
+
+                        <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4 space-y-3">
+                            {data?.config.metrics.find(m => m.id === "ctr")?.visible && (
+                                <KPICard
+                                    label="CTR"
+                                    value={formatPercent(metrics.ctr || 0)}
+                                    trend={(metrics.ctr || 0) > 1 ? "up" : "down"}
+                                    compact
+                                />
+                            )}
+                            {data?.config.metrics.find(m => m.id === "cpc")?.visible && (
+                                <KPICard
+                                    label="CPC"
+                                    value={formatCurrency(metrics.cpc || 0)}
+                                    compact
+                                />
+                            )}
+                            {data?.config.metrics.find(m => m.id === "cpl")?.visible && (
+                                <KPICard
+                                    label="COST PER LEAD"
+                                    value={formatCurrency(metrics.cpl || 0)}
+                                    compact
+                                />
+                            )}
                         </div>
                     </div>
 
@@ -485,16 +545,16 @@ export function AnalyticsClient({ client, clients = [], isSuperAdmin = false }: 
                         </Card>
                     </div>
 
-
+                    {/* Campaign Performance Table */}
                     {/* Campaign Performance Table */}
                     <div className="mt-6 space-y-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-bold tracking-tight">Campaign Performance</h2>
                             {/* Placeholder for Export Button */}
                         </div>
-                        <CampaignPerformanceTable data={campaignStats} />
+                        <CampaignPerformanceTable data={campaignStats} stages={stages} />
                     </div>
-                </main>
+                </main >
             </div >
         </div >
     );
@@ -506,18 +566,37 @@ interface KPICardProps {
     icon?: React.ReactNode;
     trend?: "up" | "down";
     className?: string;
+    compact?: boolean;
 }
 
-function KPICard({ label, value, icon, trend, className = "" }: KPICardProps) {
+function KPICard({ label, value, icon, trend, className = "", compact = false }: KPICardProps) {
+    if (compact) {
+        return (
+            <div className={`p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg ${className}`}>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{label}</p>
+                <div className="flex items-center gap-1">
+                    <span className="text-sm font-bold">{value}</span>
+                    {trend && (
+                        <span className={trend === "up" ? "text-green-500" : "text-red-500"}>
+                            {trend === "up" ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                        </span>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className={`${className}`}>
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">{label}</p>
+        <div className={`p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm ${className}`}>
+            <div className="flex items-center justify-between mb-2">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{label}</p>
+                {icon}
+            </div>
             <div className="flex items-center gap-2">
-                {icon && <span className="text-muted-foreground">{icon}</span>}
-                <span className="text-xl font-bold">{value}</span>
+                <span className="text-2xl font-bold tracking-tight">{value}</span>
                 {trend && (
-                    <span className={trend === "up" ? "text-green-500" : "text-red-500"}>
-                        {trend === "up" ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+                    <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full flex items-center gap-1 ${trend === "up" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
+                        {trend === "up" ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                     </span>
                 )}
             </div>
