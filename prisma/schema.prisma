@@ -107,6 +107,7 @@ model Client {
   spendLogs     AdSpendLog[]
   leads         Lead[]
   mappingConfigs MappingConfig[]
+  dashboardConfig DashboardConfig?
   
   // Timestamps
   createdAt     DateTime  @default(now())
@@ -343,4 +344,27 @@ model ImportHistory {
   
   @@index([clientId])
   @@index([batchId])
+}
+
+// ==================== DASHBOARD CONFIG ====================
+
+model DashboardConfig {
+  id            String      @id @default(cuid())
+  clientId      String      @unique
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // Metric definitions
+  // Format: [{ id, label, formula, format, visible, order }]
+  metrics       Json        @default("[]")
+  
+  // Chart configurations
+  // Format: [{ id, type, title, dataKey, visible, order }]
+  charts        Json        @default("[]")
+  
+  // Platform preset (META, GOOGLE, TIKTOK, CUSTOM)
+  preset        String      @default("CUSTOM")
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }

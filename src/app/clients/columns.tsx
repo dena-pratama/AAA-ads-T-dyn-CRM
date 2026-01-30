@@ -86,6 +86,7 @@ export const getColumns = ({ onEdit, onDelete, canManage }: ClientColumnsProps):
     },
     {
         id: "actions",
+        enableHiding: false,
         cell: ({ row }) => {
             const client = row.original
 

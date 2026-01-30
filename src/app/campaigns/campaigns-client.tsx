@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { getColumns, Campaign } from "@/app/campaigns/columns";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Merge, Loader2 } from "lucide-react";
+import { ArrowLeft, Merge, Loader2, Plus, Upload, FileSpreadsheet } from "lucide-react";
+import { parseAndValidateImport } from "./import-utils";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -50,8 +51,12 @@ interface CampaignsClientProps {
 }
 
 export function CampaignsClient({ data, clients, isSuperAdmin }: CampaignsClientProps) {
+    // Top-level hooks
     const [campaigns, setCampaigns] = useState(data);
     const [filterClient, setFilterClient] = useState<string>("all");
+
+    // Hydration mismatch fix state
+    const [isMounted, setIsMounted] = useState(false);
 
     // Edit dialog
     const [editOpen, setEditOpen] = useState(false);
@@ -64,6 +69,18 @@ export function CampaignsClient({ data, clients, isSuperAdmin }: CampaignsClient
     const [deleteCampaign, setDeleteCampaign] = useState<Campaign | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // Create dialog
+    const [createOpen, setCreateOpen] = useState(false);
+    const [createName, setCreateName] = useState("");
+    const [createPlatform, setCreatePlatform] = useState<string>("OTHER");
+    const [createClientId, setCreateClientId] = useState<string>("");
+    const [isCreating, setIsCreating] = useState(false);
+
+    // Import dialog
+    const [importOpen, setImportOpen] = useState(false);
+    const [isImporting, setIsImporting] = useState(false);
+    const [importFile, setImportFile] = useState<File | null>(null);
+
     // Merge dialog
     const [mergeOpen, setMergeOpen] = useState(false);
     const [mergeTarget, setMergeTarget] = useState<string>("");
@@ -72,10 +89,20 @@ export function CampaignsClient({ data, clients, isSuperAdmin }: CampaignsClient
 
     const router = useRouter();
 
+    // Effect for hydration
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     // Filter campaigns
     const filteredCampaigns = filterClient === "all"
         ? campaigns
         : campaigns.filter(c => c.clientId === filterClient);
+
+    // Early return AFTER all hooks
+    if (!isMounted) {
+        return null;
+    }
 
     const handleEdit = (campaign: Campaign) => {
         setEditCampaign(campaign);
@@ -105,6 +132,101 @@ export function CampaignsClient({ data, clients, isSuperAdmin }: CampaignsClient
             toast.error("An error occurred");
         } finally {
             setIsEditing(false);
+        }
+    };
+
+    const handleCreate = async () => {
+        if (!createName) {
+            toast.error("Name is required");
+            return;
+        }
+        // If super admin, require client selection
+        if (isSuperAdmin && !createClientId) {
+            toast.error("Please select a client");
+            return;
+        }
+
+        setIsCreating(true);
+        try {
+            const res = await fetch("/api/campaigns", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: createName,
+                    platform: createPlatform,
+                    clientId: isSuperAdmin ? createClientId : undefined
+                })
+            });
+            if (res.ok) {
+                const newCampaign = await res.json();
+                setCampaigns(prev => [newCampaign, ...prev]);
+                setCreateOpen(false);
+                setCreateName("");
+                setCreatePlatform("OTHER");
+                setCreateClientId("");
+                toast.success("Campaign created");
+            } else {
+                toast.error("Failed to create campaign");
+            }
+        } catch {
+            toast.error("An error occurred");
+        } finally {
+            setIsCreating(false);
+        }
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Reset file input
+        e.target.value = "";
+
+        const validation = await parseAndValidateImport(file);
+
+        if (!validation.isValid) {
+            toast.error(validation.error || "File validation failed");
+            setImportFile(null);
+        } else {
+            setImportFile(file);
+            toast.success(`File valid! ${validation.data?.length} rows found.`);
+        }
+    };
+
+    const executeImport = async () => {
+        if (!importFile) return;
+        setIsImporting(true);
+
+        try {
+            const validation = await parseAndValidateImport(importFile);
+            if (!validation.isValid || !validation.data) {
+                toast.error("Validation failed on submission");
+                return;
+            }
+
+            const res = await fetch("/api/campaigns/import", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    data: validation.data,
+                    clientId: isSuperAdmin && createClientId ? createClientId : undefined
+                })
+            });
+
+            if (res.ok) {
+                const result = await res.json();
+                toast.success(`Import successful: ${result.count} records`);
+                router.refresh();
+                setImportOpen(false);
+                setImportFile(null);
+            } else {
+                toast.error("Import failed");
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error("An error occurred during import");
+        } finally {
+            setIsImporting(false);
         }
     };
 
@@ -212,10 +334,20 @@ export function CampaignsClient({ data, clients, isSuperAdmin }: CampaignsClient
                     <h1 className="text-2xl font-bold">Campaigns</h1>
                     <p className="text-muted-foreground text-sm">Manage campaign names, merge duplicates</p>
                 </div>
-                <Button variant="outline" onClick={openMergeDialog}>
-                    <Merge className="h-4 w-4 mr-2" />
-                    Merge
-                </Button>
+                <div className="flex gap-2">
+                    <Button onClick={() => setImportOpen(true)} variant="outline">
+                        <Upload className="h-4 w-4 mr-2" />
+                        Import
+                    </Button>
+                    <Button onClick={() => setCreateOpen(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create
+                    </Button>
+                    <Button variant="outline" onClick={openMergeDialog}>
+                        <Merge className="h-4 w-4 mr-2" />
+                        Merge
+                    </Button>
+                </div>
             </div>
 
             {/* Filters */}
@@ -241,6 +373,139 @@ export function CampaignsClient({ data, clients, isSuperAdmin }: CampaignsClient
                 data={filteredCampaigns}
                 searchKey="name"
             />
+
+            {/* Create Dialog */}
+            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+                <DialogContent>
+                    {/* ... (Existing Create Content) ... */}
+                    <DialogHeader>
+                        <DialogTitle>Create New Campaign</DialogTitle>
+                        <DialogDescription>
+                            Manually add a campaign to track.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 space-y-4">
+                        {isSuperAdmin && (
+                            <div className="space-y-2">
+                                <Label>Client</Label>
+                                <Select value={createClientId} onValueChange={setCreateClientId}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select client" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {clients.map(c => (
+                                            <SelectItem key={c.id} value={c.id}>
+                                                {c.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+                        <div className="space-y-2">
+                            <Label htmlFor="create-name">Campaign Name</Label>
+                            <Input
+                                id="create-name"
+                                value={createName}
+                                onChange={(e) => setCreateName(e.target.value)}
+                                placeholder="e.g. Summer Sale 2024"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="create-platform">Platform</Label>
+                            <Select value={createPlatform} onValueChange={setCreatePlatform}>
+                                <SelectTrigger id="create-platform">
+                                    <SelectValue placeholder="Select platform" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="META">Meta (Facebook/IG)</SelectItem>
+                                    <SelectItem value="GOOGLE">Google Ads</SelectItem>
+                                    <SelectItem value="TIKTOK">TikTok Ads</SelectItem>
+                                    <SelectItem value="SHOPEE">Shopee Ads</SelectItem>
+                                    <SelectItem value="TOKOPEDIA">Tokopedia Ads</SelectItem>
+                                    <SelectItem value="OTHER">Other</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setCreateOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleCreate} disabled={isCreating}>
+                            {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Create
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Import Dialog */}
+            <Dialog open={importOpen} onOpenChange={setImportOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Import Campaign Data</DialogTitle>
+                        <DialogDescription>
+                            Upload Excel/CSV file with campaign performance data.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="py-6 space-y-4">
+                        {isSuperAdmin && (
+                            <div className="space-y-2">
+                                <Label>Select Client for Import</Label>
+                                <Select value={createClientId} onValueChange={setCreateClientId}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select client" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {clients.map(c => (
+                                            <SelectItem key={c.id} value={c.id}>
+                                                {c.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+
+                        {!importFile ? (
+                            <div className="border-2 border-dashed rounded-lg p-10 flex flex-col items-center justify-center text-center hover:bg-slate-50 relative cursor-pointer">
+                                <input
+                                    type="file"
+                                    accept=".xlsx,.csv"
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                    onChange={handleFileChange}
+                                />
+                                <FileSpreadsheet className="h-10 w-10 text-muted-foreground mb-4" />
+                                <p className="text-sm font-medium">Click to upload or drag and drop</p>
+                                <p className="text-xs text-muted-foreground mt-1">Excel or CSV files only</p>
+                            </div>
+                        ) : (
+                            <div className="border rounded-lg p-4 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <FileSpreadsheet className="h-8 w-8 text-green-600" />
+                                    <div>
+                                        <p className="font-medium text-sm">{importFile.name}</p>
+                                        <p className="text-xs text-muted-foreground">{(importFile.size / 1024).toFixed(1)} KB</p>
+                                    </div>
+                                </div>
+                                <Button variant="ghost" size="sm" onClick={() => setImportFile(null)}>Change</Button>
+                            </div>
+                        )}
+                    </div>
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setImportOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={executeImport} disabled={isImporting || !importFile}>
+                            {isImporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Import Data
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Edit Dialog */}
             <Dialog open={editOpen} onOpenChange={setEditOpen}>

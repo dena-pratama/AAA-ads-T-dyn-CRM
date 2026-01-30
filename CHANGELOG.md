@@ -38,6 +38,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `xlsx` library integration.
 
 ## [Unreleased]
+### Fixed
+- **Analytics Client Switcher**: 
+  - Resolved visibility issue by enforcing `z-index: 9999` on dropdown.
+  - Fixed logic to correctly identify `SUPER_ADMIN` role from session.
+  - Improved navigation using `router.push` instead of full page reload.
+  - Added visual indicator for "Clients Available" count.
+- **Data Table UI**:
+  - **Columns Button**: Fixed dropdown labels to show human-readable headers (e.g., "Business Model" instead of "currency") instead of raw object keys.
+  - **Actions Column**: Locked "Actions" column visibility to prevent accidental hiding.
+- **Code Quality**:
+  - Removed `any` types in Analytics components.
+  - Fixed linting warnings for `<img>` tags by properly disabling Next.js Image optimization for dynamic external URLs.
+  - Removed unused imports and variables in Client modules.
+
+## [Unreleased]
 
 ### Added
 - **Leads Visualization**: 

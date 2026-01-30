@@ -54,10 +54,23 @@ export async function POST(req: Request) {
         if (!session?.user) return new NextResponse("Unauthorized", { status: 401 })
 
         const body = await req.json()
-        const { name, clientId, platform } = body
+        const { name, platform } = body
+        let { clientId } = body
 
-        if (!name || !clientId || !platform) {
-            return new NextResponse("Missing required fields", { status: 400 })
+        if (!name) {
+            return new NextResponse("Name is required", { status: 400 })
+        }
+
+        // Resolve Client ID
+        if (session.user.role === "SUPER_ADMIN") {
+            if (!clientId) return new NextResponse("Client ID is required", { status: 400 })
+        } else {
+            // Regular user: force use their own client ID
+            if (clientId && clientId !== session.user.clientId) {
+                return new NextResponse("Forbidden", { status: 403 })
+            }
+            clientId = session.user.clientId
+            if (!clientId) return new NextResponse("User has no client", { status: 400 })
         }
 
         // Check if campaign with same name exists
@@ -66,14 +79,14 @@ export async function POST(req: Request) {
         })
 
         if (existing) {
-            return new NextResponse("Campaign with this name already exists", { status: 400 })
+            return new NextResponse("Campaign with this name already exists", { status: 409 })
         }
 
         const campaign = await prisma.campaign.create({
             data: {
                 name,
                 originalName: name,
-                platform,
+                platform: platform || "OTHER",
                 clientId,
                 isActive: true
             }

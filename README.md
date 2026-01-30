@@ -21,6 +21,7 @@
 - 🔐 **Robust Authentication**: Sistem login aman menggunakan NextAuth.js v5 dengan Google OAuth & Credentials, serta Role-Based Access Control (Super Admin, Client Admin, CS).
 - 🎨 **Modern UI/UX**: Desain Glassmorphism yang bersih dengan dukungan **Dark/Light Mode** penuh.
 - 👥 **User Management**: Manajemen pengguna terpusat dengan role yang fleksibel.
+- 📊 **Interactive Analytics**: Dashboard performa iklan dengan filter multi-platform (Meta, Google, TikTok) dan fitur export laporan.
 - 📱 **Responsive Design**: Tampilan optimal di desktop dan mobile.
 
 ### Upcoming Features

@@ -98,9 +98,7 @@ export function ClientsClient({ data, canManage = false }: ClientsClientProps) {
                 )}
             </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-1">
-                <DataTable columns={columns} data={data} searchKey="name" />
-            </div>
+            <DataTable columns={columns} data={data} searchKey="name" />
 
             <ClientDialog open={dialogOpen} setOpen={setDialogOpen} clientToEdit={clientToEdit} />
 

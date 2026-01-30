@@ -133,14 +133,14 @@
   - [x] Step 6: Import Execution
 
 ### 2.2 Mapping Configuration
-- [ ] API Routes
-  - [ ] `GET /api/mappings` - List saved mappings
-  - [ ] `POST /api/mappings` - Save mapping
-  - [ ] `DELETE /api/mappings/[id]` - Delete mapping
-- [ ] Features
-  - [ ] Auto-detect matching columns
-  - [ ] Platform-specific defaults
-  - [ ] Client-specific mappings
+- [x] API Routes
+  - [x] `GET /api/mappings` - List saved mappings
+  - [x] `POST /api/mappings` - Save mapping
+  - [x] `DELETE /api/mappings/[id]` - Delete mapping
+- [x] Features
+  - [x] Auto-detect matching columns
+  - [x] Platform-specific defaults
+  - [x] Client-specific mappings
 
 ### 2.3 Campaign Management
 - [x] API Routes
@@ -161,34 +161,34 @@
 ## 📊 Phase 3: Data Grid & Inline Editing (Day 7-8)
 
 ### 3.1 TanStack Table Setup
-- [ ] Install @tanstack/react-table
-- [ ] Create reusable DataTable component
-- [ ] Features
-  - [ ] Column definitions
-  - [ ] Sorting (multi-column)
-  - [ ] Filtering (column + global)
-  - [ ] Pagination
-  - [ ] Column visibility toggle
-  - [ ] Column resizing
+- [x] Install @tanstack/react-table
+- [x] Create reusable DataTable component
+- [x] Features
+  - [x] Column definitions
+  - [x] Sorting (multi-column)
+  - [x] Filtering (column + global)
+  - [x] Pagination
+  - [x] Column visibility toggle
+  - [x] Column resizing
 
 ### 3.2 Ad Spend Grid
-- [ ] API Routes
-  - [ ] `GET /api/spend` - List spend data (with filters)
-  - [ ] `PUT /api/spend/[id]` - Update single record
+- [x] API Routes
+  - [x] `GET /api/spend` - List spend data (with filters)
+  - [x] `PUT /api/spend/[id]` - Update single record
   - [ ] `PUT /api/spend/bulk` - Bulk update
-  - [ ] `DELETE /api/spend/[id]` - Delete record
-- [ ] UI Pages
-  - [ ] `/spend` - Spend data grid
-- [ ] Features
-  - [ ] Inline cell editing
-    - [ ] Click to edit
-    - [ ] Enter to save
-    - [ ] Escape to cancel
+  - [x] `DELETE /api/spend/[id]` - Delete record
+- [x] UI Pages
+  - [x] `/spend` - Spend data grid
+- [x] Features
+  - [x] Inline cell editing
+    - [x] Click to edit
+    - [x] Enter to save
+    - [x] Escape to cancel
   - [ ] Auto-save (debounced 500ms)
   - [ ] Edit indicator (unsaved changes)
   - [ ] Undo last change
-  - [ ] Date range filter
-  - [ ] Platform filter
+  - [x] Date range filter
+  - [x] Platform filter
   - [ ] Campaign filter
   - [ ] Export to Excel
 
@@ -203,28 +203,28 @@
 ## 👥 Phase 4: CRM & Lead Entry (Day 9-10)
 
 ### 4.1 Lead Entry Form
-- [ ] API Routes
+- [x] API Routes
   - [x] `POST /api/leads` - Create lead
   - [x] `GET /api/leads` - List leads
   - [x] `PUT /api/leads/[id]` - Update lead
-  - [ ] `PUT /api/leads/[id]/stage` - Update stage
+  - [x] `PUT /api/leads/[id]/stage` - Update stage
   - [x] `DELETE /api/leads/[id]` - Delete lead
-- [ ] UI Pages
+- [x] UI Pages
   - [x] `/leads` - Lead list/kanban (Placeholder + Import Trigger)
   - [x] `/leads/new` - Lead entry form
-  - [ ] `/leads/[id]` - Lead detail
+  - [x] `/leads/[id]` - Lead detail
 - [x] Features
   - [x] Source dropdown (Meta, GAds, LinkedAds)
   - [x] CS Number field for tracking CS assignments
   - [x] Stage selection from pipeline
-  - [ ] Quick notes
-  - [ ] Revenue/value input
+  - [x] Quick notes
+  - [x] Revenue/value input
 
 ### 4.2 Lead Views
 - [x] List View
   - [x] DataTable with all leads
   - [x] Stage filter
-  - [ ] Date range filter
+  - [x] Date range filter
   - [x] Search by name/phone
 - [x] Kanban View
   - [x] Columns = Pipeline stages
@@ -241,34 +241,39 @@
 ## 📈 Phase 5: Intelligence Dashboard (Day 11-14)
 
 ### 5.1 Dashboard API
-- [ ] API Routes
-  - [ ] `GET /api/analytics/overview` - Summary metrics
+- [x] API Routes
+  - [x] `GET /api/analytics/overview` - Summary metrics (Implemented as `/api/analytics/[clientId]`)
   - [ ] `GET /api/analytics/campaigns` - Per-campaign breakdown
-  - [ ] `GET /api/analytics/trends` - Time-series data
-- [ ] Aggregation Queries
-  - [ ] Total Spend
-  - [ ] Total Leads
+  - [x] `GET /api/analytics/trends` - Time-series data (Implemented in main endpoint)
+- [x] Aggregation Queries
+  - [x] Total Spend
+  - [x] Total Leads
   - [ ] Leads per stage
-  - [ ] Total Revenue
+  - [ ] Total Revenue (Value)
   - [ ] CPPL (Cost Per Potential Lead)
   - [ ] ROAS (Return on Ad Spend)
-  - [ ] CPL (Cost Per Lead)
+  - [x] CPL (Cost Per Lead)
 
 ### 5.2 Dashboard UI
-- [ ] UI Pages
-  - [ ] `/dashboard` - Main dashboard
-- [ ] Components
-  - [ ] Metric cards (with trend indicators)
-  - [ ] Campaign performance table
-  - [ ] Spend vs Revenue chart (line/bar)
+- [x] UI Pages
+  - [x] `/dashboard` - Main dashboard (Link added)
+  - [x] `/analytics/[clientId]` - Client Analytics Dashboard
+- [x] Components
+  - [x] Metric cards (with trend indicators)
+  - [x] Campaign performance table
+  - [x] Spend vs Revenue chart (Area/Bar charts implemented)
   - [ ] Lead funnel visualization
   - [ ] Stage distribution (pie/donut)
-- [ ] Features
-  - [ ] Date range picker
-  - [ ] Client filter (SuperAdmin)
-  - [ ] Platform filter
-  - [ ] Campaign filter
-  - [ ] Export report to PDF/Excel
+- [x] Features
+  - [x] Date range picker
+  - [x] Client selector (Analytics Sidebar)
+  - [x] Platform filter
+  - [x] Campaign filter
+  - [x] Export report to PDF/Excel
+  - [x] Manual Campaign Creation
+  - [x] Smart Import with Validation
+  - [x] Fixed: Client Switcher Visibility (Z-index & Role Fixes)
+  - [x] Fixed: Data Table Columns Button (Human-readable labels)
 
 ### 5.3 Dynamic Columns
 - [ ] Table columns adjust based on Pipeline stages
