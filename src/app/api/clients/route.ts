@@ -65,11 +65,26 @@ export async function GET(req: Request) {
     try {
         const session = await auth();
 
-        if (!session || session.user.role !== "SUPER_ADMIN") {
+        if (!session) {
+            console.log("GET /api/clients: No session found");
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
+        console.log("GET /api/clients: Session User:", { 
+            id: session.user.id, 
+            role: session.user.role, 
+            clientId: session.user.clientId 
+        });
+
+        // Allow SUPER_ADMIN to see all, CLIENT_ADMIN to see own
+        const where = session.user.role === "SUPER_ADMIN" 
+            ? {} 
+            : { id: session.user.clientId || "non-existent" };
+        
+        console.log("GET /api/clients: Query Where:", where);
+
         const clients = await prisma.client.findMany({
+            where,
             orderBy: { createdAt: "desc" },
             include: {
                 _count: {
@@ -81,6 +96,8 @@ export async function GET(req: Request) {
                 }
             }
         });
+
+        console.log(`GET /api/clients: Found ${clients.length} clients`);
 
         return NextResponse.json(clients);
     } catch (error) {

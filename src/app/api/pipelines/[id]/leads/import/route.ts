@@ -34,7 +34,6 @@ export async function POST(
         // Verify Pipeline Access
         const pipeline = await prisma.pipeline.findUnique({
             where: { id: pipelineId },
-            include: { stages: true }
         })
 
         if (!pipeline) {
@@ -79,15 +78,16 @@ export async function POST(
 
             return prisma.lead.create({
                 data: {
-                    name,
+                    customerName: name,
                     email: email || null,
-                    phone: phone || null,
+                    phone: phone || "",
                     value: value || 0,
                     notes: notes || null,
                     pipelineId: pipelineId,
-                    stageId: entryStageId,
+                    currentStage: entryStageId,
                     clientId: pipeline.clientId,
-                    data: leadData as Prisma.InputJsonValue
+                    campaignName: "Import",
+                    customData: leadData as Prisma.InputJsonValue
                 }
             })
         });

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import { LoginForm } from "@/app/login/login-form";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -40,7 +41,9 @@ export default function LoginPage() {
 
                 {/* Login Card */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-2xl shadow-slate-200/50 dark:shadow-black/20">
-                    <LoginForm />
+                    <Suspense fallback={<div className="flex justify-center py-8">Loading...</div>}>
+                        <LoginForm />
+                    </Suspense>
                 </div>
 
                 {/* Footer */}

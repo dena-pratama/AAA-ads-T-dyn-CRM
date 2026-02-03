@@ -9,7 +9,39 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     ...authConfig,
-    adapter: PrismaAdapter(prisma),
+    adapter: PrismaAdapter(prisma) as any,
+    callbacks: {
+        ...authConfig.callbacks,
+        async jwt({ token, user, trigger }) {
+            if (user) {
+                token.id = user.id;
+                token.role = user.role;
+                token.clientId = user.clientId;
+                token.clientName = user.clientName;
+            }
+
+            // Fetch allowedBrandIds (on every request for now, optimize later with cache)
+            if (token.id) {
+                const memberships = await prisma.brandMembership.findMany({
+                    where: { userId: token.id as string },
+                    select: { brandId: true },
+                });
+                token.allowedBrandIds = memberships.map(m => m.brandId);
+            }
+
+            return token;
+        },
+        async session({ session, token }) {
+            if (session.user) {
+                session.user.id = token.id as string;
+                session.user.role = token.role as string;
+                session.user.clientId = token.clientId as string | null;
+                session.user.clientName = token.clientName as string | undefined;
+                session.user.allowedBrandIds = token.allowedBrandIds as string[] | undefined;
+            }
+            return session;
+        },
+    },
     providers: [
         Google({
             clientId: process.env.GOOGLE_CLIENT_ID,

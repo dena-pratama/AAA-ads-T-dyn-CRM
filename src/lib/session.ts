@@ -9,6 +9,7 @@ export type UserSession = {
     role: string;
     clientId: string | null;
     clientName?: string;
+    allowedBrandIds?: string[];
 };
 
 // Get current session on server
@@ -46,4 +47,13 @@ export function canAccessClient(
 ): boolean {
     if (userRole === "SUPER_ADMIN") return true;
     return userClientId === targetClientId;
+}
+
+// Antigravity: Check if user can access a brand
+export function canAccessBrand(
+    user: UserSession,
+    brandId: string
+): boolean {
+    if (user.role === "SUPER_ADMIN") return true;
+    return user.allowedBrandIds?.includes(brandId) ?? false;
 }

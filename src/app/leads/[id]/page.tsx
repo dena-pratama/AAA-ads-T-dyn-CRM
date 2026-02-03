@@ -52,5 +52,23 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
         redirect("/leads");
     }
 
-    return <LeadDetailClient lead={lead} />;
+    // Convert Prisma types to client component compatible types
+    const leadData = {
+        ...lead,
+        value: lead.value ? Number(lead.value) : null,
+        leadDate: lead.leadDate.toISOString(),
+        createdAt: lead.createdAt.toISOString(),
+        updatedAt: lead.updatedAt.toISOString(),
+        customData: (lead.customData || {}) as Record<string, unknown>,
+        pipeline: lead.pipeline ? {
+            ...lead.pipeline,
+            stages: lead.pipeline.stages as { id: string; name: string; color: string; order: number; isGoal?: boolean }[],
+        } : null,
+        stageHistory: lead.stageHistory.map(h => ({
+            ...h,
+            movedAt: h.movedAt.toISOString(),
+        })),
+    };
+
+    return <LeadDetailClient lead={leadData} />;
 }

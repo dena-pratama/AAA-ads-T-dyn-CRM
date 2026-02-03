@@ -35,6 +35,27 @@ enum LeadStatus {
   ARCHIVED
 }
 
+// ==================== ANTIGRAVITY ENUMS ====================
+
+enum Marketplace {
+  TIKTOK
+  SHOPEE
+  LAZADA
+  TOKOPEDIA
+}
+
+enum ReportStatus {
+  PROCESSING
+  DONE
+  FAILED
+}
+
+enum BrandRole {
+  OWNER
+  ADMIN
+  VIEWER
+}
+
 // ==================== AUTH ====================
 
 model User {
@@ -53,6 +74,9 @@ model User {
   // Multi-tenant relationship
   clientId      String?
   client        Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  
+  // Antigravity: Brand membership
+  brandMemberships BrandMembership[]
   
   // Timestamps
   createdAt     DateTime  @default(now())
@@ -108,6 +132,10 @@ model Client {
   leads         Lead[]
   mappingConfigs MappingConfig[]
   dashboardConfig DashboardConfig?
+  
+  // Antigravity relationships
+  brands        Brand[]
+  antigravityReports AntigravityReport[]
   
   // Timestamps
   createdAt     DateTime  @default(now())
@@ -367,4 +395,76 @@ model DashboardConfig {
   // Timestamps
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+// ==================== ANTIGRAVITY: BRAND & REPORT ====================
+
+model Brand {
+  id            String        @id @default(cuid())
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  name          String
+  marketplace   Marketplace
+  description   String?
+  isActive      Boolean       @default(true)
+  
+  // Relationships
+  memberships   BrandMembership[]
+  reports       AntigravityReport[]
+  
+  // Timestamps
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  @@unique([clientId, name, marketplace])
+  @@index([clientId])
+}
+
+model BrandMembership {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brandId       String
+  brand         Brand         @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  
+  role          BrandRole     @default(VIEWER)
+  
+  // Timestamps
+  createdAt     DateTime      @default(now())
+  
+  @@unique([userId, brandId])
+  @@index([userId])
+  @@index([brandId])
+}
+
+model AntigravityReport {
+  id            String        @id @default(cuid())
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  brandId       String
+  brand         Brand         @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  
+  marketplace   Marketplace
+  status        ReportStatus  @default(PROCESSING)
+  
+  // File info
+  kelolaFileName String?
+  incomeFileName String?
+  
+  // Result data (stored as JSON)
+  resultJson    Json?         // { summaryGlobal, summaryDaily, dailyTables }
+  errorJson     Json?         // { message, stack, details }
+  
+  // Upload metadata
+  uploadedById  String?
+  
+  // Timestamps
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  processedAt   DateTime?
+  
+  @@index([clientId, brandId])
+  @@index([brandId, marketplace])
+  @@index([createdAt])
 }

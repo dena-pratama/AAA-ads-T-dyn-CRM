@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.1] - 2026-02-03
+
+### Fixed
+
+- **Shopee Report Engine Rewrite**:
+  - **Strict Revenue Calculation**: Changed logic to use raw sum of "Harga Asli Produk" from Income file for global Total Revenue (ignoring order matching errors).
+  - **Unmatched Fallback**: Implemented "Income Date" fallback. If an Order ID cannot be matched to the Orders file, the settlement is now assigned to its Income Date, preventing "Rp 0" days in Daily Breakdown.
+  - **Aggressive Matching**: Improved Order ID normalization (stripping non-alphanumeric chars) to better match Income vs Order files.
+  - **Fee Calculation**: Now sums all fee columns found in Income file for more accurate Net/Fee reporting.
+  - **Crash Fixes**: Resolved variable scope issues and syntax errors in `shopeeEngine.ts` rewrite.
+
 ## [0.7.0] - 2026-02-03
 
 ### Removed

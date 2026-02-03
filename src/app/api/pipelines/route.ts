@@ -102,7 +102,7 @@ export async function POST(req: Request) {
 
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return new NextResponse(JSON.stringify(error.errors), { status: 400 })
+            return new NextResponse(JSON.stringify(error.issues), { status: 400 })
         }
         console.error("[PIPELINES_POST]", error)
         return new NextResponse("Internal error", { status: 500 })

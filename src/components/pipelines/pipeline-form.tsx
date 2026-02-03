@@ -30,7 +30,7 @@ export function PipelineForm({ initialData, clients, isSuperAdmin, readOnly = fa
     const [isLoading, setIsLoading] = useState(false)
 
     // Ensure we have at least one valid client if creating new as SuperAdmin
-    const defaultClientId = initialData?.clientId || (clients && clients.length > 0 ? clients[0].id : "")
+    const defaultClientId = initialData?.clientId || (clients && clients.length > 0 ? clients[0]?.id : "") || ""
 
     const form = useForm<z.infer<typeof pipelineSchema>>({
         resolver: zodResolver(pipelineSchema),

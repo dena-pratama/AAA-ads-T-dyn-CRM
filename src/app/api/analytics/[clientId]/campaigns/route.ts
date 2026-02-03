@@ -119,6 +119,7 @@ export async function GET(
             }
 
             const stat = leadsMap[item.campaignName];
+            if (!stat) return;
             stat.count += item._count.id;
             stat.revenue += Number(item._sum.value || 0);
 

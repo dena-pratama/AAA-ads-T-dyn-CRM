@@ -32,7 +32,11 @@ async function main() {
 
     const superAdmin = await prisma.user.upsert({
         where: { email: "admin@aaa-ads.com" },
-        update: {},
+        update: {
+            password: hashedPassword,
+            role: UserRole.SUPER_ADMIN,
+            isActive: true,
+        },
         create: {
             email: "admin@aaa-ads.com",
             password: hashedPassword,
@@ -213,6 +217,59 @@ async function main() {
         });
     }
     console.log("✅ Created", sampleLeads.length, "sample leads");
+
+    // ==================== ANTIGRAVITY: Brand Seed Data ====================
+    const Marketplace = {
+        TIKTOK: "TIKTOK",
+        SHOPEE: "SHOPEE",
+        LAZADA: "LAZADA",
+        TOKOPEDIA: "TOKOPEDIA",
+    } as const;
+
+    const BrandRole = {
+        OWNER: "OWNER",
+        ADMIN: "ADMIN",
+        VIEWER: "VIEWER",
+    } as const;
+
+    // Create TikTok Shop Brand
+    // Create TikTok Shop Brand
+    const tiktokBrand = await prisma.brand.upsert({
+        where: {
+            clientId_name_marketplace: {
+                clientId: demoClient.id,
+                name: "Demo TikTok Shop",
+                marketplace: Marketplace.TIKTOK,
+            },
+        },
+        update: {},
+        create: {
+            clientId: demoClient.id,
+            name: "Demo TikTok Shop",
+            marketplace: Marketplace.TIKTOK,
+            description: "Demo brand for TikTok Seller testing",
+            isActive: true,
+        },
+    });
+    console.log("✅ Created Brand:", tiktokBrand.name);
+
+    // Create BrandMembership for Client Admin
+    // Create Brand Membership
+    await prisma.brandMembership.upsert({
+        where: {
+            userId_brandId: {
+                userId: clientAdmin.id,
+                brandId: tiktokBrand.id,
+            },
+        },
+        update: {},
+        create: {
+            userId: clientAdmin.id,
+            brandId: tiktokBrand.id,
+            role: BrandRole.OWNER,
+        },
+    });
+    console.log("✅ Created BrandMembership: Client Admin -> Demo TikTok Shop (OWNER)");
 
     console.log("\n🎉 Seed completed successfully!");
     console.log("\n📝 Login credentials:");

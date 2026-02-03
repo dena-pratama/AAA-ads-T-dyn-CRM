@@ -26,7 +26,7 @@ export default async function EditPipelinePage({ params }: { params: Promise<{ i
         return <div className="p-8 text-red-500">Forbidden.</div>
     }
 
-    let clients = []
+    let clients: { id: string; name: string }[] = []
     if (session.user.role === "SUPER_ADMIN") {
         clients = await prisma.client.findMany({ select: { id: true, name: true } })
     }
@@ -34,6 +34,7 @@ export default async function EditPipelinePage({ params }: { params: Promise<{ i
     // Cast JSON to expected type safely
     const formattedData: z.infer<typeof pipelineSchema> & { id: string } = {
         ...pipeline,
+        description: pipeline.description ?? undefined,
         stages: pipeline.stages as unknown as z.infer<typeof pipelineSchema>["stages"],
         customFields: pipeline.customFields as unknown as z.infer<typeof pipelineSchema>["customFields"],
     }

@@ -13,7 +13,7 @@ export default async function NewPipelinePage() {
         return <div className="p-8 text-red-500">You do not have permission to create pipelines.</div>
     }
 
-    let clients = []
+    let clients: { id: string; name: string }[] = []
 
     // If SuperAdmin, fetch clients to allow assignment
     if (session.user.role === "SUPER_ADMIN") {

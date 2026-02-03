@@ -10,7 +10,7 @@ export default async function LeadsPage() {
 
     // Fetch pipelines for the import selector
     const whereClause: { clientId?: string } = {}
-    if (session.user.role !== "SUPER_ADMIN") {
+    if (session.user.role !== "SUPER_ADMIN" && session.user.clientId) {
         whereClause.clientId = session.user.clientId
     }
 
@@ -19,5 +19,11 @@ export default async function LeadsPage() {
         select: { id: true, name: true, stages: true }
     })
 
-    return <LeadsClient pipelines={pipelines} />
+    // Cast stages to proper type for client component
+    const typedPipelines = pipelines.map(p => ({
+        ...p,
+        stages: (p.stages || []) as { id: string; name: string; color: string }[]
+    }));
+
+    return <LeadsClient pipelines={typedPipelines} />
 }

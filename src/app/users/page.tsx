@@ -47,7 +47,6 @@ export default async function UsersPage() {
             <Header user={user} />
 
             <main className="container mx-auto px-6 py-8">
-                {/* @ts-expect-error - Type matching issue with strict Prisma types vs UI types, safe to ignore for MVP */}
                 <UsersClient data={users} />
             </main>
         </div>
