@@ -23,29 +23,25 @@
 - 👥 **User Management**: Manajemen pengguna terpusat dengan role yang fleksibel.
 - 📊 **Interactive Analytics**: Dashboard performa iklan dengan filter multi-platform (Meta, Google, TikTok) dan fitur export laporan.
 - 📈 **Advanced Metrics**: Real-Time CPPL, ROAS, dan Revenue tracking dengan Dynamic Column support.
+- 📊 **Excel-Like Grid**: Edit data inline seperti spreadsheet dengan TanStack Table.
+- 🔄 **Dynamic Pipeline**: Custom alur bisnis per klien dengan stage management.
 - 📱 **Responsive Design**: Tampilan optimal di desktop dan mobile.
-
-### Upcoming Features
-
-- 📥 **Smart CSV Import**: Upload & mapping data iklan dari berbagai platform (Meta, Google, TikTok).
-- 📊 **Excel-Like Grid**: Edit data inline seperti spreadsheet.
-- 🔄 **Dynamic Pipeline**: Custom alur bisnis per klien.
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer | Technology | Status |
-|-------|------------|--------|
-| **Framework** | Next.js 14+ (App Router) | ✅ Active |
-| **Language** | TypeScript (Strict Mode) | ✅ Active |
-| **Database** | Supabase (PostgreSQL 16) | ✅ Active |
-| **ORM** | Prisma | ✅ Active |
-| **Styling** | Tailwind CSS v4 | ✅ Active |
-| **Components** | Shadcn/UI | ✅ Active |
-| **Theming** | next-themes (Light/Dark) | ✅ Active |
-| **Auth** | NextAuth.js v5 (Auth.js) | ✅ Active |
-| **Icons** | Lucide React | ✅ Active |
+| Layer          | Technology               | Status    |
+| -------------- | ------------------------ | --------- |
+| **Framework**  | Next.js 14+ (App Router) | ✅ Active |
+| **Language**   | TypeScript (Strict Mode) | ✅ Active |
+| **Database**   | Supabase (PostgreSQL 16) | ✅ Active |
+| **ORM**        | Prisma                   | ✅ Active |
+| **Styling**    | Tailwind CSS v4          | ✅ Active |
+| **Components** | Shadcn/UI                | ✅ Active |
+| **Theming**    | next-themes (Light/Dark) | ✅ Active |
+| **Auth**       | NextAuth.js v5 (Auth.js) | ✅ Active |
+| **Icons**      | Lucide React             | ✅ Active |
 
 ---
 
@@ -114,13 +110,13 @@ erDiagram
     Client ||--o{ User : manages
     Client ||--o{ Pipeline : defines
     Client ||--o{ Campaign : runs
-    
+
     User {
         string role "SUPER_ADMIN | CLIENT_ADMIN | CS"
         string email
         string password
     }
-    
+
     Pipeline {
         json stages "Dynamic stages config"
     }

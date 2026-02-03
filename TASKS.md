@@ -9,6 +9,7 @@
 ## 🛠 Phase 0: Foundation Setup (Day 1-2)
 
 ### 0.1 Project Initialization
+
 - [x] Create GitHub repository
 - [x] Setup `.gitignore` for Next.js + Prisma + Docker
 - [x] Initialize Next.js 14+ with App Router
@@ -18,6 +19,7 @@
 - [x] Initial commit & push to GitHub
 
 ### 0.2 UI Framework Setup
+
 - [x] Install & configure Tailwind CSS
 - [x] Setup Shadcn/UI
   - [x] Initialize with `npx shadcn@latest init`
@@ -29,6 +31,7 @@
   - [x] Page container
 
 ### 0.3 Database Setup
+
 - [x] Create `docker-compose.yml` for PostgreSQL 16
 - [x] Setup Prisma ORM
   - [x] Initialize Prisma: `npx prisma init`
@@ -42,9 +45,10 @@
   - [x] Lead model
   - [x] MappingConfig model
 - [x] Run initial migration
-- [/] Create seed data script (Prisma 7 compatibility issue marked for review)
+- [x] Create seed data script
 
 ### 0.4 Authentication
+
 - [x] Install NextAuth.js v5 (Auth.js)
 - [x] Configure credentials provider (email/password)
 - [x] Create auth middleware
@@ -57,6 +61,7 @@
 - [x] Session management
 
 ### 0.5 Rebranding & UI Polish (New)
+
 - [x] Rename app to "Asoy Analytics Ads"
 - [x] Update Logo (Dragon Icon)
 - [x] Remove Demo Credentials from Login UI
@@ -70,8 +75,8 @@
 
 ## ⚙️ Phase 1: Client & Pipeline Management (Day 3-4)
 
-
 ### 1.1 Client Management
+
 - [x] API Routes
   - [x] `GET /api/clients` - List all clients
   - [x] `POST /api/clients` - Create client
@@ -85,6 +90,7 @@
   - [x] Updated Column Headers (Id-Client, Business Model, Handler)
 
 ### 1.1b User Management (New)
+
 - [x] API Routes (`/api/users`)
   - [x] GET (List), POST (Create), PUT (Update), DELETE (Remove)
 - [x] UI Pages (`/users`)
@@ -95,8 +101,8 @@
     - [x] Profile Picture Preview & Validation
     - [x] Remove Picture functionality
 
-
 ### 1.2 Pipeline Builder
+
 - [x] API Routes
   - [x] `GET /api/pipelines` - List pipelines (by client)
   - [x] `POST /api/pipelines` - Create pipeline
@@ -117,32 +123,14 @@
 
 ## 📥 Phase 2: Ingestion Engine (Day 5-6)
 
-### 2.1 Smart CSV/Excel Importer
-- [x] Install SheetJS (xlsx)
-- [x] API Routes
-  - [x] `POST /api/spend/import` - Execute import with auto-campaign creation
-  - [x] `GET /api/import/history` - Import history
-- [x] UI Pages
-  - [x] `/spend/import` - Import wizard
-- [x] Features
-  - [x] Step 1: File Upload (Multi-sheet support)
-  - [x] Step 2: Sheet Selection
-  - [x] Step 3: Data Preview
-  - [x] Step 4: Column Mapping (Platform templates)
-  - [x] Step 5: Validation (Zod + Client side)
-  - [x] Step 6: Import Execution
+> **⚠️ REMOVED (2026-02-03)**: Import features were removed due to functionality issues.
 
-### 2.2 Mapping Configuration
-- [x] API Routes
-  - [x] `GET /api/mappings` - List saved mappings
-  - [x] `POST /api/mappings` - Save mapping
-  - [x] `DELETE /api/mappings/[id]` - Delete mapping
-- [x] Features
-  - [x] Auto-detect matching columns
-  - [x] Platform-specific defaults
-  - [x] Client-specific mappings
+### ~~2.1 Smart CSV/Excel Importer~~ (REMOVED)
+
+### ~~2.2 Mapping Configuration~~ (REMOVED)
 
 ### 2.3 Campaign Management
+
 - [x] API Routes
   - [x] `GET /api/campaigns` - List campaigns
   - [x] `PUT /api/campaigns/[id]` - Update campaign
@@ -161,6 +149,7 @@
 ## 📊 Phase 3: Data Grid & Inline Editing (Day 7-8)
 
 ### 3.1 TanStack Table Setup
+
 - [x] Install @tanstack/react-table
 - [x] Create reusable DataTable component
 - [x] Features
@@ -172,6 +161,7 @@
   - [x] Column resizing
 
 ### 3.2 Ad Spend Grid
+
 - [x] API Routes
   - [x] `GET /api/spend` - List spend data (with filters)
   - [x] `PUT /api/spend/[id]` - Update single record
@@ -193,6 +183,7 @@
   - [ ] Export to Excel
 
 ### 3.3 Performance Optimization
+
 - [ ] Virtual scrolling for 1000+ rows
 - [ ] Memoized cell renderers
 - [ ] Optimistic updates
@@ -203,6 +194,7 @@
 ## 👥 Phase 4: CRM & Lead Entry (Day 9-10)
 
 ### 4.1 Lead Entry Form
+
 - [x] API Routes
   - [x] `POST /api/leads` - Create lead
   - [x] `GET /api/leads` - List leads
@@ -221,6 +213,7 @@
   - [x] Revenue/value input
 
 ### 4.2 Lead Views
+
 - [x] List View
   - [x] DataTable with all leads
   - [x] Stage filter
@@ -233,6 +226,7 @@
   - [x] Stage count indicators
 
 ### 4.3 Lead Import (Bonus)
+
 - [x] Bulk import leads from Excel
 - [x] Column mapping similar to spend import
 
@@ -241,6 +235,7 @@
 ## 📈 Phase 5: Intelligence Dashboard (Day 11-14)
 
 ### 5.1 Dashboard API
+
 - [x] API Routes
   - [x] `GET /api/analytics/overview` - Summary metrics (Implemented as `/api/analytics/[clientId]`)
   - [x] `GET /api/analytics/campaigns` - Per-campaign breakdown (Implemented as `/api/analytics/[clientId]/campaigns`)
@@ -255,6 +250,7 @@
   - [x] CPL (Cost Per Lead)
 
 ### 5.2 Dashboard UI
+
 - [x] UI Pages
   - [x] `/dashboard` - Main dashboard (Link added)
   - [x] `/analytics/[clientId]` - Client Analytics Dashboard
@@ -276,6 +272,7 @@
   - [x] Fixed: Data Table Columns Button (Human-readable labels)
 
 ### 5.3 Dynamic Columns
+
 - [x] Table columns adjust based on Pipeline stages
 - [x] Show lead count per stage
 - [ ] Conversion rate between stages
@@ -285,18 +282,21 @@
 ## 🐳 Phase 6: Deployment & Polish
 
 ### 6.1 Dockerization
+
 - [ ] Create production Dockerfile
 - [ ] Multi-stage build (minimize image size)
 - [ ] Environment variable configuration
 - [ ] Health check endpoint
 
 ### 6.2 Performance Testing
+
 - [ ] Test with 1000+ spend records
 - [ ] Test with 500+ leads
 - [ ] Measure page load times
 - [ ] Query optimization if needed
 
 ### 6.3 Final Testing
+
 - [ ] End-to-end test: Create client with custom pipeline
 - [ ] End-to-end test: Import CSV, verify data
 - [ ] End-to-end test: Inline edit spend

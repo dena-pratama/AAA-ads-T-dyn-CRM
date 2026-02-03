@@ -7,9 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.0] - 2026-02-03
+
+### Removed
+
+- **Import Features Removed**:
+  - Deleted `/spend/import` - Ad Spend Import Wizard
+  - Deleted `/pipelines/[id]/import` - Lead Import Wizard
+  - Deleted `/api/spend/import` - Spend Import API
+  - Deleted `/api/import/history` - Import History API
+  - Deleted `/api/mappings` - Mapping Config API
+  - Deleted `ColumnMapper` component
+  - Removed Import buttons from Spend, Leads, and Campaigns pages
+  - Removed `xlsx` library usage from campaign import
+
+> **Reason**: Import features were not working properly and removed for code cleanup.
+
+---
+
 ## [0.6.0] - 2026-01-31
 
 ### Added
+
 - **Dynamic Campaign Analytics**:
   - **Dynamic Table Columns**: Campaign performance table now adapts columns based on the Client's Pipeline Stages.
   - **Stage-Specific Metrics**: Leads are now counted and displayed per pipeline stage (e.g., "New Lead", "Contacted", "Closing").
@@ -20,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **API Enhancements**: `/api/analytics/[clientId]/campaigns` now returns `stages` metadata and nested `breakdown` stats.
 
 ### Fixed
+
 - **Build & Types**:
   - Resolved `any` type errors in Analytics API routes.
   - Fixed build failures related to `prisma.config.ts`.
@@ -30,12 +50,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.0] - 2026-01-29
 
 ### Added
+
 - **Lead Form Enhancements**:
   - Replaced "Value (IDR)" field with "Source" dropdown (Meta, GAds, LinkedAds).
   - Added "No CS" field to track which Customer Service handles each lead.
   - Added `csNumber` column to Lead database model.
-  
+
 ### Fixed
+
 - **Leads CRUD Operations**:
   - Fixed `clientId: null` error for SUPER_ADMIN users by resolving clientId from selected pipeline.
   - Fixed Next.js 15+ `params` Promise handling in dynamic API routes.
@@ -47,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.4.0] - 2026-01-29
 
 ### Added
+
 - **Ad Spend Import Module**:
   - New `/spend` page as dashboard for ad costs.
   - New `/spend/import` wizard for bulk uploading Excel/CSV files.
@@ -58,8 +81,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `xlsx` library integration.
 
 ## [Unreleased]
+
+### Added
+
+- **Advanced Analytics**:
+  - **Revenue & ROAS**: Real-time calculation of Return on Ad Spend and Total Revenue from leads.
+  - **Dashboard Settings**: New configuration dialog to Show/Hide specific metrics and charts per client.
+  - **New Metrics**: Added support for CPPL (Cost Per Potential Lead) and expanded financial metrics.
+- **Leads Visualization**:
+  - Integrated `Recharts` for lead stage distribution.
+  - Implemented List vs Chart view toggle.
+- **UI Enhancements**:
+  - Improved padding on Leads and Campaigns pages (`p-8`).
+  - Added "Import feature coming soon" toast.
+- **Leads Module**: Created dedicated Leads page (`/leads`) with "Import" trigger.
+- **Import Wizard**: Implemented multi-step wizard for bulk importing leads from Excel/CSV (`/pipelines/[id]/import`).
+- **Dynamic Mapping**: Added `ColumnMapper` to map file headers to System & Custom Fields.
+- **Bulk API**: Created optimized API using `prisma.$transaction` and `createMany` logic for fast data insertion.
+- **Dashboard**: Integrated Leads entry point in the main Dashboard.
+
+### Changed
+
+- **Pipeline Details**: Refactored to use Tabs (Leads vs Settings) - _Reverted to keep Settings clean, moved Leads to specialized page_.
+- **Navigation**: Added "Back to Dashboard" button on Leads page for better UX.
+
 ### Fixed
-- **Analytics Client Switcher**: 
+
+- **Analytics Client Switcher**:
   - Resolved visibility issue by enforcing `z-index: 9999` on dropdown.
   - Fixed logic to correctly identify `SUPER_ADMIN` role from session.
   - Improved navigation using `router.push` instead of full page reload.
@@ -71,43 +119,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed `any` types in Analytics components.
   - Fixed linting warnings for `<img>` tags by properly disabling Next.js Image optimization for dynamic external URLs.
   - Removed unused imports and variables in Client modules.
-
-## [Unreleased]
-### Added
-- **Advanced Analytics**:
-  - **Revenue & ROAS**: Real-time calculation of Return on Ad Spend and Total Revenue from leads.
-  - **Dashboard Settings**: New configuration dialog to Show/Hide specific metrics and charts per client.
-  - **New Metrics**: Added support for CPPL (Cost Per Potential Lead) and expanded financial metrics.
-- **Leads Visualization**: 
-  - Integrated `Recharts` for lead stage distribution.
-  - Implemented List vs Chart view toggle.
-- **UI Enhancements**:
-  - Improved padding on Leads and Campaigns pages (`p-8`).
-  - Added "Import feature coming soon" toast.
-
-### Fixed
 - **Hydration Errors**:
   - Removed Radix UI `Tabs` causing component ID mismatch.
   - Implemented `mounted` check for client-side only rendering of complex UI components.
 - **Linting**:
   - Resolved unused variables and import errors in `leads-client.tsx` and `campaigns-client.tsx`.
-
-### Added
-- **Leads Module**: Created dedicated Leads page (`/leads`) with "Import" trigger.
-- **Import Wizard**: Implemented multi-step wizard for bulk importing leads from Excel/CSV (`/pipelines/[id]/import`).
-- **Dynamic Mapping**: Added `ColumnMapper` to map file headers to System & Custom Fields.
-- **Bulk API**: Created optimized API using `prisma.$transaction` and `createMany` logic for fast data insertion.
-- **Dashboard**: Integrated Leads entry point in the main Dashboard.
-
-### Changed
-- **Pipeline Details**: Refactored to use Tabs (Leads vs Settings) - *Reverted to keep Settings clean, moved Leads to specialized page*.
-- **Navigation**: Added "Back to Dashboard" button on Leads page for better UX.
-
-### Fixed
 - **Pipeline Access**: Fixed `async params` issue in Next.js 16 dynamic routes.
 - **UI Consistency**: Standardized `AnimatedBeam` and specific UI elements.
 
 ### 🚀 Added
+
 - Initial project repository setup
 - Comprehensive `.gitignore` for Next.js + Prisma + Docker
 - **Next.js 14+ project** with App Router & TypeScript strict mode
@@ -147,6 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fixed:** Async params runtime error in dynamic routes (Next.js 15+ breaking change).
 
 ### Changed
+
 - **Rebranding & UI Overhaul:**
   - Renamed application to **"Asoy Analytics Ads"**
   - Updated application logo (Dragon Icon)
@@ -164,9 +186,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Profile Settings:**
     - Profile picture upload (Base64) with live preview and validation.
     - Updated UI layout and improved type safety.
-  - **Dashboard:** 
+  - **Dashboard:**
     - Removed redundant text and improved layout.
-  - **Header:** 
+  - **Header:**
     - Dynamic user role display (Super Admin vs Client Admin).
   - **Client Management:**
     - Renamed columns for better clarity (Id-Client, Business Model, Handler).
@@ -181,6 +203,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - **Navigation:** Added 'Pipelines' to Dashboard and Header menu.
 
 ### 📝 Documentation
+
 - Created detailed `TASKS.md` with granular task breakdown
 - Created `CHANGELOG.md` for development history
 
@@ -193,6 +216,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Session Start:** 01:17 WIB
 
 #### Activities:
+
 1. **Project Planning**
    - Reviewed comprehensive project requirements document
    - Analyzed technical stack: Next.js 14+, TypeScript, PostgreSQL, Prisma, Shadcn/UI, TanStack Table
@@ -222,14 +246,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    - Note: Docker not installed on system - consider using cloud DB
 
 #### Decisions Made:
+
 - **Authentication:** NextAuth.js v5 (recommended)
 - **File Parsing:** Client-side with SheetJS (better UX)
 - **Database:** Docker Compose with PostgreSQL 16 (or cloud alternative)
 
 #### Blockers:
+
 - ✅ RESOLVED: Using Supabase cloud PostgreSQL instead of Docker
 
 #### Next Steps:
+
 - Implement authentication (NextAuth.js v5)
 - Build dashboard layout
 
@@ -244,9 +271,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
-| Version | Date | Description |
-|---------|------|-------------|
-| 0.0.1 | 2026-01-29 | Project initialization |
+| Version | Date       | Description            |
+| ------- | ---------- | ---------------------- |
+| 0.0.1   | 2026-01-29 | Project initialization |
 
 ---
 

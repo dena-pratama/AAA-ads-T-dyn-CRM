@@ -31,7 +31,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { DataTable } from "@/components/ui/data-table";
 import { getSpendColumns, SpendLog } from "@/components/spend/columns";
-import { Upload, ArrowLeft, Loader2, Search, Calendar } from "lucide-react";
+import { ArrowLeft, Loader2, Search, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 const PLATFORMS = ["META", "GOOGLE", "TIKTOK", "SHOPEE", "TOKOPEDIA", "LAZADA", "OTHER"];
@@ -213,12 +213,6 @@ export function SpendClient({ clients, isSuperAdmin }: SpendClientProps) {
                         </p>
                     </div>
                 </div>
-                <Button asChild>
-                    <Link href="/spend/import">
-                        <Upload className="mr-2 h-4 w-4" />
-                        Import Data
-                    </Link>
-                </Button>
             </div>
 
             {/* Filters */}

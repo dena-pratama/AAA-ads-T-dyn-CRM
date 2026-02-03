@@ -235,9 +235,12 @@ export function AnalyticsClient({ client, clients = [], isSuperAdmin = false }: 
                                 {isSuperAdmin && clients.length > 0 ? (
                                     <Select
                                         value={client.id}
-                                        onValueChange={(val) => router.push(`/analytics/${val}`)}
+                                        onValueChange={(val) => {
+                                            setLoading(true);
+                                            router.push(`/analytics/${val}`);
+                                        }}
                                     >
-                                        <SelectTrigger className="w-full h-10 bg-white dark:bg-slate-950">
+                                        <SelectTrigger className="w-full h-10 bg-white dark:bg-slate-950 cursor-pointer">
                                             <div className="flex items-center gap-2 text-left overflow-hidden">
                                                 {client.logo ? (
                                                     /* eslint-disable-next-line @next/next/no-img-element */
@@ -250,7 +253,7 @@ export function AnalyticsClient({ client, clients = [], isSuperAdmin = false }: 
                                                 <span className="font-semibold truncate text-sm">{client.name}</span>
                                             </div>
                                         </SelectTrigger>
-                                        <SelectContent className="z-[9999] max-h-[300px]">
+                                        <SelectContent className="z-50 max-h-[300px]">
                                             {clients.map(c => (
                                                 <SelectItem key={c.id} value={c.id}>
                                                     <div className="flex items-center gap-2">

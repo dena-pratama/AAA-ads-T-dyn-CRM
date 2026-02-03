@@ -29,7 +29,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import { Upload, Plus, ArrowLeft, Loader2, Search, List as ListIcon, BarChart3 } from "lucide-react";
+import { Plus, ArrowLeft, Loader2, Search, List as ListIcon, BarChart3 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/ui/data-table";
 import { getColumns, Lead } from "@/components/leads/columns";
@@ -230,12 +230,6 @@ export function LeadsClient({ pipelines }: LeadsClientProps) {
                             />
                         </DialogContent>
                     </Dialog>
-
-                    {/* Import Trigger */}
-                    <Button variant="outline" onClick={() => toast.info("Import feature coming soon")}>
-                        <Upload className="mr-2 h-4 w-4" />
-                        Import
-                    </Button>
                 </div>
             </div>
 
